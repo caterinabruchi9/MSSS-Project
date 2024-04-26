@@ -22,7 +22,7 @@ class WifiScanner(private val context: Context) {
 
     // BroadcastReceiver to handle results of WiFi scans
     private val wifiScanReceiver = object : BroadcastReceiver() {
-        override fun onReceive(c: Context, intent: Intent) {
+        override fun onReceive(c: Context, intent: Intent) { 
             if (WifiManager.SCAN_RESULTS_AVAILABLE_ACTION == intent.action) {
                 // Post the scan results to LiveData to be observed
                 _wifiScanResults.postValue(wifiManager.scanResults)

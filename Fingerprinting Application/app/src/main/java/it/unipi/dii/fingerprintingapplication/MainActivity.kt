@@ -43,7 +43,13 @@ class MainActivity : AppCompatActivity() {
 
         // Observes changes in the Wi-Fi scan results and updates the UI accordingly.
         wifiScanner.wifiScanResults.observe(this, Observer { results ->
-            val resultText = results.joinToString("\n") { "${it.SSID}, ${it.level}dBm, ${it.frequency}MHz" }
+            val sortedResults = results.sortedWith(compareBy({ it.SSID }, { it.BSSID }))
+            val resultText = sortedResults.joinToString("\n") { result ->
+                "SSID: ${result.SSID}, " +
+                        "BSSID: ${result.BSSID}, " +
+                        "Frequency: ${result.frequency}MHz, " +
+                        "Level: ${result.level}dBm, " + '\n'
+            }
             textViewResults.text = resultText
             textViewStatus.text = "Scan completed"
             buttonScan.isEnabled = true
@@ -55,9 +61,9 @@ class MainActivity : AppCompatActivity() {
                 textViewStatus.text = "Scan in progress..."
                 buttonScan.isEnabled = false
                 // Triggers the Wi-Fi to toggle and start scanning.
-                wifiScanner.toggleWifi()
-                wifiScanner.startScanDelayed()
-                // wifiScanner.startScan()
+                //wifiScanner.toggleWifi()
+                //wifiScanner.startScanDelayed()
+                wifiScanner.startScan()
             } else {
                 // Requests the necessary permissions if not already granted.
                 ActivityCompat.requestPermissions(

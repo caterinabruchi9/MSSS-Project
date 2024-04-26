@@ -51,18 +51,27 @@
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintVertical_bias="0.1"/>
 
-    <TextView
-        android:id="@+id/textViewResults"
+    <ScrollView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Results will appear here"
-        app:layout_constraintTop_toBottomOf="@id/buttonScan"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintVertical_bias="0.05"
-        android:padding="16dp"
-        android:textAlignment="center" />
+        android:layout_marginTop="8dp"
+        android:fillViewport="true"
+        app:layout_constraintTop_toBottomOf="@id/textViewStatus"
+        tools:layout_editor_absoluteX="115dp">
+
+        <TextView
+            android:id="@+id/textViewResults"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:padding="16dp"
+            android:text="Results will appear here"
+            android:textAlignment="center"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/buttonScan"
+            app:layout_constraintVertical_bias="0.05" />
+    </ScrollView>
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>
