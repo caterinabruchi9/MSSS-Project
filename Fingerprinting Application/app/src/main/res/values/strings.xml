@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">Fingerprinting Application</string>
+    <string name="title_scan_activity">Scan Activity</string>
 </resources>
