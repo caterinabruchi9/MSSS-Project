@@ -16,6 +16,6 @@ data class MapInfo(
 )
 
 data class MapResponse(
-    val status: String,
+    val status: Int,
     val message: String?
 )
