@@ -1,5 +1,6 @@
 package it.unipi.dii.fingerprintingapplication
 
+import android.content.Intent
 import android.os.Bundle
 import android.widget.Button
 import android.widget.EditText
@@ -13,7 +14,6 @@ import retrofit2.Response
 import retrofit2.Call
 import java.io.IOException
 import java.util.UUID
-
 
 class CreateMapActivity : AppCompatActivity(){
 
@@ -32,7 +32,7 @@ class CreateMapActivity : AppCompatActivity(){
         buttonCreateMap.setOnClickListener {
             val buildingName = editTextBuildingName.text.toString()
             val rooms = editTextRooms.text.toString().toInt()
-            val mapId = UUID.randomUUID().toString()
+            val mapId = UUID.randomUUID().hashCode()
 
             val mapInfo = MapInfo(rooms, buildingName, mapId)
             sendMapData(mapInfo)
@@ -50,6 +50,9 @@ class CreateMapActivity : AppCompatActivity(){
                         runOnUiThread {
                             Toast.makeText(applicationContext, "Map created successfully! Message: ${responseBody.message}", Toast.LENGTH_LONG).show()
                         }
+                        val intent = Intent(this@CreateMapActivity, MainActivity::class.java)
+                        intent.putExtra("mode", "new")
+                        startActivity(intent)
                     } else {
                         // Azione in caso di risposta non riuscita ma valida
                         runOnUiThread {
