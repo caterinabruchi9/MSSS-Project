@@ -15,7 +15,7 @@ class MainActivity : AppCompatActivity() {
 
 
             // Intent per avviare ScanActivity in modalità "Crea Nuova Mappa"
-            val intent = Intent(this, ScanActivity::class.java)
+            val intent = Intent(this, CreateMapActivity::class.java)
             intent.putExtra("mode", "new")
             startActivity(intent)
         }
