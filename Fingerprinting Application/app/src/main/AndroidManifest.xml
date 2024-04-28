@@ -5,6 +5,7 @@
     <uses-permission android:name="android.permission.CHANGE_WIFI_STATE" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <uses-permission android:name="android.permission.INTERNET"/>
 
     <application
         android:allowBackup="true"
@@ -30,6 +31,9 @@
             android:label="@string/title_scan_activity">
         </activity>
 
+        <activity android:name=".CreateMapActivity"
+            android:label="@string/title_createmap_activity">
+        </activity>
 
     </application>
 
