@@ -52,6 +52,7 @@
         app:layout_constraintVertical_bias="0.1"/>
 
     <ScrollView
+        android:id="@+id/scrollView2"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="12dp"
@@ -74,5 +75,17 @@
             app:layout_constraintVertical_bias="0.05" />
     </ScrollView>
 
+    <Button
+        android:id="@+id/buttonSendFingerprint"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/buttonScan"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="108dp"
+        android:text="Send Fingerprint Data"
+        android:visibility="visible"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/scrollView2" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

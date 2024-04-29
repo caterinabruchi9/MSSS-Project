@@ -6,10 +6,14 @@ import android.os.Bundle
 import android.widget.Button
 import android.widget.EditText
 import android.widget.TextView
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.Observer
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
 
 // Main activity class for handling the UI and initiating Wi-Fi scans.
 class ScanActivity : AppCompatActivity() {
@@ -24,14 +28,15 @@ class ScanActivity : AppCompatActivity() {
     private lateinit var editTextIdArea: EditText
     private lateinit var editTextCoordinates: EditText
     private lateinit var buttonScan: Button
+    private lateinit var buttonSendFingerprint: Button
     private lateinit var textViewStatus: TextView
-
+    private var mapId: Int = 0
     // Called when the activity is starting.
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         // Set the user interface layout for this Activity.
         setContentView(R.layout.activity_scan)
-
+        mapId = intent.getIntExtra("MAP_ID", 0)
         // Initialize the Wi-Fi scanner and UI components.
         wifiScanner = WifiScanner(this)
         textViewResults = findViewById(R.id.textViewResults)
@@ -39,6 +44,7 @@ class ScanActivity : AppCompatActivity() {
         editTextIdArea= findViewById(R.id.editTextIdArea)
         editTextCoordinates = findViewById(R.id.editTextCoordinates)
         buttonScan = findViewById(R.id.buttonScan)
+        buttonSendFingerprint = findViewById(R.id.buttonSendFingerprint)
 
         // Observes changes in the Wi-Fi scan results and updates the UI accordingly.
         wifiScanner.wifiScanResults.observe(this, Observer { results ->
@@ -71,6 +77,10 @@ class ScanActivity : AppCompatActivity() {
                     LOCATION_PERMISSION_REQUEST_CODE
                 )
             }
+
+        }
+        buttonSendFingerprint.setOnClickListener {
+            sendFingerprintData()
         }
     }
 
@@ -100,5 +110,41 @@ class ScanActivity : AppCompatActivity() {
         super.onDestroy()
         wifiScanner.unregisterReceiver() // Unregister receiver to avoid memory leaks
     }
-}
+
+    private fun sendFingerprintData() {
+        val areaId = editTextIdArea.text.toString()
+        val coordinates = editTextCoordinates.text.toString()
+
+        if (areaId.isBlank() || coordinates.isBlank()) {
+            Toast.makeText(this, "Please enter valid area ID and coordinates", Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        wifiScanner.wifiScanResults.value?.forEach { scanResult ->
+            val fingerprintData = FingerprintData(
+                RSS = scanResult.level,
+                bssid = scanResult.BSSID,
+                mapId = mapId,
+                frequency = scanResult.frequency,
+                zone = areaId.toInt(),  // Assicurati che questi campi siano numerici e gestisci eventuali errori di conversione
+                sample = coordinates.toInt()
+            )
+
+            RetrofitClient.service.sendFingerprint(fingerprintData).enqueue(object : Callback<FingerprintResponse> {
+                override fun onResponse(call: Call<FingerprintResponse>, response: Response<FingerprintResponse>) {
+                    if (response.isSuccessful) {
+                        Toast.makeText(applicationContext, "Fingerprint sent successfully", Toast.LENGTH_SHORT).show()
+                    } else {
+                        Toast.makeText(applicationContext, "Failed to send fingerprint: ${response.code()}", Toast.LENGTH_LONG).show()
+                    }
+                }
+
+                override fun onFailure(call: Call<FingerprintResponse>, t: Throwable) {
+                    Toast.makeText(applicationContext, "Error sending fingerprint: ${t.message}", Toast.LENGTH_LONG).show()
+                }
+            })
+        }
+    }
+    }
+
 

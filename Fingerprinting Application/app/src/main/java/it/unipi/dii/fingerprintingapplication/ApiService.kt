@@ -14,6 +14,9 @@ interface ApiService {
     @GET("maps/list")
     fun getMaps(): Call<ResponseBody>
 
+    @POST("fingerprint")
+    fun sendFingerprint(@Body fingerprintData: FingerprintData): Call<FingerprintResponse>
+
 }
 
 data class MapInfo(
@@ -30,5 +33,19 @@ data class SimpleMapInfo(
 data class MapResponse(
     val status: Int,
     val message: String?
+)
+
+data class FingerprintResponse(
+    val status: Int,
+    val message: String?
+)
+
+data class FingerprintData(
+    val RSS: Int,
+    val bssid: String,
+    val mapId: Int,
+    val frequency: Int,
+    val zone: Int,
+    val sample: Int
 )
 
