@@ -4,6 +4,7 @@ import retrofit2.Call
 import retrofit2.http.Body
 import retrofit2.http.POST
 import com.google.gson.annotations.SerializedName
+import okhttp3.ResponseBody
 import retrofit2.http.GET
 
 interface ApiService {
@@ -11,7 +12,7 @@ interface ApiService {
     fun createMap(@Body mapInfo: MapInfo): Call<MapResponse>
 
     @GET("maps/list")
-    fun getMaps(): Call<MapListResponse>
+    fun getMaps(): Call<ResponseBody>
 
 }
 
@@ -21,11 +22,13 @@ data class MapInfo(
     @SerializedName("map-id")val mapId: Int
 )
 
+data class SimpleMapInfo(
+    @SerializedName("building-name") val buildingName: String,
+    @SerializedName("map-id")val mapId: Int
+)
+
 data class MapResponse(
     val status: Int,
     val message: String?
 )
 
-data class MapListResponse(
-    val maps: List<MapInfo>
-)
