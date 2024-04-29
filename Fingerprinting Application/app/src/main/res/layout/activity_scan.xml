@@ -12,10 +12,10 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:hint="Enter Area ID"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.1" />
 
     <EditText
@@ -23,10 +23,10 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:hint="Enter coordinates"
-        app:layout_constraintTop_toBottomOf="@id/editTextIdArea"
-        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/editTextIdArea"
         app:layout_constraintVertical_bias="0.1" />
 
     <Button
@@ -34,10 +34,10 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Scan WiFi"
-        app:layout_constraintTop_toBottomOf="@id/editTextCoordinates"
-        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/editTextCoordinates"
         app:layout_constraintVertical_bias="0.1" />
 
     <TextView
@@ -45,21 +45,36 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Status will be shown here"
-        app:layout_constraintTop_toBottomOf="@id/buttonScan"
-        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintVertical_bias="0.1"/>
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/buttonScan" />
+
+    <Button
+        android:id="@+id/buttonSendFingerprint"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/buttonScan"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="29dp"
+        android:text="Send Fingerprint Data"
+        android:visibility="visible"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/textViewStatus" />
 
     <ScrollView
         android:id="@+id/scrollView2"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="12dp"
         android:fillViewport="true"
-        app:layout_constraintTop_toBottomOf="@id/textViewStatus"
-        tools:ignore="MissingConstraints"
-        tools:layout_editor_absoluteX="115dp">
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/buttonSendFingerprint"
+        app:layout_constraintVertical_bias="0.125"
+        tools:ignore="MissingConstraints">
+
 
         <TextView
             android:id="@+id/textViewResults"
@@ -73,20 +88,8 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/buttonScan"
             app:layout_constraintVertical_bias="0.05" />
-        <Button
-            android:id="@+id/buttonSendFingerprint"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@id/buttonScan"
-            android:layout_centerHorizontal="true"
-            android:layout_marginTop="108dp"
-            android:text="Send Fingerprint Data"
-            android:visibility="visible"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/scrollView2" />
-    </ScrollView>
 
+    </ScrollView>
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

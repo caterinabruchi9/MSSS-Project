@@ -45,6 +45,7 @@ class ScanActivity : AppCompatActivity() {
         editTextCoordinates = findViewById(R.id.editTextCoordinates)
         buttonScan = findViewById(R.id.buttonScan)
         buttonSendFingerprint = findViewById(R.id.buttonSendFingerprint)
+        buttonSendFingerprint.isEnabled = false
 
         // Observes changes in the Wi-Fi scan results and updates the UI accordingly.
         wifiScanner.wifiScanResults.observe(this, Observer { results ->
@@ -62,6 +63,7 @@ class ScanActivity : AppCompatActivity() {
 
         // Sets up the button click listener to start Wi-Fi scanning.
         buttonScan.setOnClickListener {
+            buttonSendFingerprint.isEnabled = true
             if (checkLocationPermission()) {
                 textViewStatus.text = "Scan in progress..."
                 buttonScan.isEnabled = false
