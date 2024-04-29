@@ -31,20 +31,22 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun fetchMapsAndShowDialog() {
-        RetrofitClient.service.getMaps().enqueue(object : Callback<List<MapInfo>> {
-            override fun onResponse(call: Call<List<MapInfo>>, response: Response<List<MapInfo>>) {
+        RetrofitClient.service.getMaps().enqueue(object : Callback<MapListResponse> {
+            override fun onResponse(call: Call<MapListResponse>, response: Response<MapListResponse>) {
                 if (response.isSuccessful && response.body() != null) {
-                    showMapSelectionDialog(response.body()!!)
+                    val maps = response.body()!!.maps
+                    showMapSelectionDialog(maps)
                 } else {
                     Toast.makeText(this@MainActivity, "Failed to retrieve maps", Toast.LENGTH_LONG).show()
                 }
             }
 
-            override fun onFailure(call: Call<List<MapInfo>>, t: Throwable) {
+            override fun onFailure(call: Call<MapListResponse>, t: Throwable) {
                 Toast.makeText(this@MainActivity, "Error: ${t.message}", Toast.LENGTH_LONG).show()
             }
         })
     }
+
 
     private fun showMapSelectionDialog(maps: List<MapInfo>) {
         val mapNames = maps.map { it.buildingName }.toTypedArray()
