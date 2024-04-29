@@ -41,11 +41,12 @@ data class FingerprintResponse(
 )
 
 data class FingerprintData(
-    val RSS: Int,
-    val bssid: String,
-    val mapId: Int,
-    val frequency: Int,
-    val zone: Int,
-    val sample: Int
+    @SerializedName("ssid") val ssid: String,
+    @SerializedName("RSS")  val RSS: Int,
+    @SerializedName("bssid") val bssid: String,
+    @SerializedName("map-id") val mapId: Int,
+    @SerializedName("frequency") val frequency: Int,
+    @SerializedName("zone") val zone: Int,
+    @SerializedName("sample") val sample: Int
 )
 

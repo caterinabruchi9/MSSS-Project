@@ -124,6 +124,7 @@ class ScanActivity : AppCompatActivity() {
 
         wifiScanner.wifiScanResults.value?.forEach { scanResult ->
             val fingerprintData = FingerprintData(
+                ssid = scanResult.SSID,
                 RSS = scanResult.level,
                 bssid = scanResult.BSSID,
                 mapId = mapId,
