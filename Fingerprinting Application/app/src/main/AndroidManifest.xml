@@ -36,6 +36,11 @@
             android:label="@string/title_createmap_activity">
         </activity>
 
+        <activity android:name=".PositioningActivity"
+            android:label="@string/title_positioning_activity">
+        </activity>
+
+
     </application>
 
 </manifest>

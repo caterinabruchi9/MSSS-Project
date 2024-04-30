@@ -4,13 +4,22 @@ import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 
 object RetrofitClient {
-    private const val BASE_URL = "https://e458-93-57-251-59.ngrok-free.app/"
+    private val baseUrlFormat = "https://%s.ngrok-free.app/"
+    var subdomain = "713e-131-114-63-2"
+    private var retrofit: Retrofit = buildRetrofitClient()
 
-    val service: ApiService by lazy {
-        Retrofit.Builder()
-            .baseUrl(BASE_URL)
+    val service: ApiService
+        get() = retrofit.create(ApiService::class.java)
+
+    private fun buildRetrofitClient(): Retrofit {
+        return Retrofit.Builder()
+            .baseUrl(String.format(baseUrlFormat, subdomain))
             .addConverterFactory(GsonConverterFactory.create())
             .build()
-            .create(ApiService::class.java)
+    }
+
+    fun updateSubdomain(newSubdomain: String) {
+        subdomain = newSubdomain
+        retrofit = buildRetrofitClient()  // Ricostruisci il client con il nuovo URL base
     }
 }
