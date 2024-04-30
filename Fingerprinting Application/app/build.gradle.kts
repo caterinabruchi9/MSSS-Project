@@ -49,4 +49,5 @@ dependencies {
     implementation(libs.retrofit2)
     implementation(libs.retrofit2.converter.gson)
     implementation(libs.gson)
+    implementation("org.apache.commons:commons-csv:1.8")
 }

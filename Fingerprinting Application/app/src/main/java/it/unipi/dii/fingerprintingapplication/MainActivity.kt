@@ -74,5 +74,10 @@ class MainActivity : AppCompatActivity() {
         intent.putExtra("MAP_ID", mapId)
         startActivity(intent)
     }
+
+    private fun localizeMe(fingerprintData: List<FingerprintData>, mapId: List<Int>) {
+
+
+    }
 }
 
