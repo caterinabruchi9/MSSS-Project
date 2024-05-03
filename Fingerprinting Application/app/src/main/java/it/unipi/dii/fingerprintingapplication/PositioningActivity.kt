@@ -20,6 +20,7 @@ import retrofit2.Callback
 import retrofit2.Response
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
+import com.google.gson.JsonArray
 
 class PositioningActivity : AppCompatActivity() {
 
@@ -28,11 +29,13 @@ class PositioningActivity : AppCompatActivity() {
     private lateinit var wifiScanner: WifiScanner
     private var serverFingerprints: List<Sample> = emptyList()  // Memorizza i fingerprint come una lista di Sample
 
+    private lateinit var textViewFingerprintDetails: TextView
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_positioning)
 
         textViewPosition = findViewById(R.id.textViewPosition)
+        textViewFingerprintDetails = findViewById(R.id.textViewFingerprintDetails)
         buttonCalculatePosition = findViewById(R.id.buttonCalculatePosition)
         wifiScanner = WifiScanner(this)
 
@@ -43,6 +46,7 @@ class PositioningActivity : AppCompatActivity() {
             performScanAndCalculatePosition()
         }
     }
+
 
     private fun performScanAndCalculatePosition() {
         wifiScanner.startScan()  // Avvia la scansione WiFi
@@ -55,21 +59,19 @@ class PositioningActivity : AppCompatActivity() {
                 Fingerprint(it.SSID, it.BSSID, it.frequency, it.level)
             }
             val currentSample = Sample(0, 0, currentFingerprints.toMutableList())
-            val nearestSample = currentSample.findNearestSample(serverFingerprints)
+            val nearestSample = currentSample.findNearestSample(this, serverFingerprints)
             textViewPosition.text = "Nearest Position: Zone: ${nearestSample?.first}, Sample: ${nearestSample?.second}"
         })
     }
-
     private fun fetchFingerprints(mapId: Int) {
-        RetrofitClient.service.getFingerprintsForMap(mapId).enqueue(object : Callback<ResponseBody> {  // Utilizza ResponseBody se necessario decodificare manualmente il JSON
+        RetrofitClient.service.getFingerprintsForMap(mapId).enqueue(object : Callback<ResponseBody> {
             override fun onResponse(call: Call<ResponseBody>, response: Response<ResponseBody>) {
                 if (response.isSuccessful) {
                     response.body()?.let { responseBody ->
                         val json = JsonParser.parseString(responseBody.string()).asJsonObject
-                        val fingerprintsJson = json.getAsJsonArray("fingerprints")  // Ottieni l'array di fingerprints
-                        val fingerprints = fingerprintsJson.map { it.asJsonArray.toList() }
-                        serverFingerprints = convertToSamples(fingerprints as List<List<Any>>)
-                        textViewPosition.text = "Fingerprints loaded successfully!"
+                        val fingerprintsJson = json.getAsJsonArray("fingerprints")
+                        serverFingerprints = convertToSamples(fingerprintsJson)
+                        textViewPosition.text = "Fingerprints loaded: ${serverFingerprints.size}"
                     }
                 } else {
                     textViewPosition.text = "Failed to fetch data: ${response.code()}"
@@ -82,26 +84,29 @@ class PositioningActivity : AppCompatActivity() {
         })
     }
 
-    private fun convertToSamples(fingerprints: List<List<Any>>?): List<Sample> {
+
+
+
+    private fun convertToSamples(fingerprintsJson: JsonArray): List<Sample> {
         val samples = mutableMapOf<Pair<Int, Int>, MutableList<Fingerprint>>()
 
-        fingerprints?.forEach { rawFp ->
-            if (rawFp.size >= 6) {  // Assicurati che ci siano abbastanza elementi nell'array per evitare errori
-                val ssid = rawFp[0] as? String ?: ""
-                val bssid = rawFp[1] as? String ?: ""
-                val frequency = (rawFp[2] as? Number)?.toInt() ?: 0
-                val rss = (rawFp[3] as? Number)?.toInt() ?: 0
-                val zone = (rawFp[4] as? Number)?.toInt() ?: 0
-                val sample = (rawFp[5] as? Number)?.toInt() ?: 0
+        fingerprintsJson.forEach { element ->
+            val array = element.asJsonArray
+            val ssid = array[0].asString
+            val bssid = array[1].asString
+            val frequency = array[2].asInt
+            val rss = array[3].asInt
+            val zone = array[4].asInt
+            val sample = array[5].asInt
 
-                val fingerprint = Fingerprint(ssid, bssid, frequency, rss)
-                val key = Pair(zone, sample)
-                samples.getOrPut(key) { mutableListOf() }.add(fingerprint)
-            }
+            val fingerprint = Fingerprint(ssid, bssid, frequency, rss)
+            val key = Pair(zone, sample)
+            samples.getOrPut(key) { mutableListOf() }.add(fingerprint)
         }
 
         return samples.map { Sample(it.key.first, it.key.second, it.value) }
     }
+
 
 
     override fun onDestroy() {

@@ -18,8 +18,9 @@ interface ApiService {
     @POST("fingerprint")
     fun sendFingerprint(@Body fingerprintData: FingerprintData): Call<FingerprintResponse>
 
-    @GET("maps/{id}")
-    fun getFingerprintsForMap(@Path("id") mapId: Int): Call<ResponseBody>
+    @GET("maps/{mapId}")
+    fun getFingerprintsForMap(@Path("mapId") mapId: Int): Call<ResponseBody>  // Usa ResponseBody per la decodifica manuale
+
 
 }
 

@@ -1,9 +1,13 @@
+import android.widget.Toast
 import org.apache.commons.csv.CSVFormat
 import org.apache.commons.csv.CSVParser
 import java.io.File
 import kotlin.math.pow
 import kotlin.math.sqrt
 import kotlin.random.Random
+import android.content.Context
+
+
 
 class Fingerprint(val ssid: String, val bssid: String, val frequency: Int, var rss: Int)
 
@@ -32,7 +36,7 @@ class Sample(val zona: Int, val sample: Int, val fingerprints: MutableList<Finge
         return sqrt(sum)
     }
 
-    fun findNearestSample(samples: List<Sample>): Pair<Int, Int>? {
+    fun findNearestSample(context: Context, samples: List<Sample>): Pair<Int, Int>? {
         var minDistance = Double.MAX_VALUE
         var nearestSample: Pair<Int, Int>? = null
 
@@ -47,6 +51,7 @@ class Sample(val zona: Int, val sample: Int, val fingerprints: MutableList<Finge
         return nearestSample
     }
 
+
 }
 
 data class Map(val list: List<Sample>)
@@ -54,7 +59,7 @@ data class Map(val list: List<Sample>)
 
 
 
-fun main() {
+/*fun main() {
     // Read data from CSV file and create the example map with fingerprints
     val listOfSamples = mutableListOf<Sample>()
     val csvFile = File("map.csv")
@@ -108,3 +113,4 @@ fun main() {
 
     println("Result: ${perturbedSample.findNearestSample(map.list).toString()}")
 }
+*/
