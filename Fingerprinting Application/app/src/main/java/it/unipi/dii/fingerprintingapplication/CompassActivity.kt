@@ -1,10 +1,13 @@
 package it.unipi.dii.fingerprintingapplication
 
+
+
 import android.hardware.Sensor
 import android.hardware.SensorEvent
 import android.hardware.SensorEventListener
 import android.hardware.SensorManager
 import android.os.Bundle
+import android.os.Handler
 import android.widget.Button
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
@@ -22,6 +25,9 @@ class CompassActivity : AppCompatActivity(), SensorEventListener {
     private val orientationAngles = FloatArray(3)
 
     private lateinit var buttonGetAzimuth: Button
+    private lateinit var textViewAzimuth: TextView
+
+    private val handler = Handler()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -32,6 +38,7 @@ class CompassActivity : AppCompatActivity(), SensorEventListener {
         accelerometer = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER)
 
         buttonGetAzimuth = findViewById<Button>(R.id.orientationButton)
+        textViewAzimuth = findViewById(R.id.orientationResult)
 
         buttonGetAzimuth.setOnClickListener {
             // Trigger azimuth calculation when the button is clicked
@@ -57,11 +64,11 @@ class CompassActivity : AppCompatActivity(), SensorEventListener {
                 SensorManager.SENSOR_DELAY_NORMAL
             )
         }
-    }
 
-    override fun onPause() {
-        super.onPause()
-        stopAzimuthSampling()
+        // Stop sampling after one second
+        handler.postDelayed({
+            stopAzimuthSampling()
+        }, 1000)
     }
 
     private fun stopAzimuthSampling() {
@@ -83,7 +90,6 @@ class CompassActivity : AppCompatActivity(), SensorEventListener {
         }
 
         updateOrientationAngles()
-        stopAzimuthSampling() // Stop sampling after obtaining orientation
     }
 
     private fun updateOrientationAngles() {
@@ -97,7 +103,6 @@ class CompassActivity : AppCompatActivity(), SensorEventListener {
         val correctedAzimuth = if (azimuthDegrees < 0) azimuthDegrees + 360 else azimuthDegrees
 
         // Update TextView with the corrected azimuth
-        val textViewAzimuth = findViewById<TextView>(R.id.orientationResult)
         textViewAzimuth.text = "Azimuth: $correctedAzimuth"
     }
 }
