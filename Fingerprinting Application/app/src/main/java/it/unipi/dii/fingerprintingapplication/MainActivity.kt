@@ -1,5 +1,6 @@
 package it.unipi.dii.fingerprintingapplication
 
+import CompassActivity
 import android.content.Intent
 import android.os.Bundle
 import android.widget.Button
@@ -17,6 +18,7 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var editTextServerSubdomain: EditText
     private lateinit var buttonChangeServerAddress: Button
+    private lateinit var buttonCompassTest: Button
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -49,6 +51,11 @@ class MainActivity : AppCompatActivity() {
             } else {
                 Toast.makeText(this, "Please enter a valid server subdomain.", Toast.LENGTH_SHORT).show()
             }
+        }
+
+        buttonCompassTest.setOnClickListener {
+            val intent = Intent(this, CompassActivity::class.java)
+            startActivity(intent)
         }
 
     }

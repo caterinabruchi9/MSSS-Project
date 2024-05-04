@@ -7,6 +7,16 @@
     android:layout_height="match_parent"
     tools:context=".ScanActivity">
 
+    <Button
+        android:id="@+id/buttonCompass"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="60dp"
+        android:text="Compass Test"
+        app:layout_constraintTop_toBottomOf="@+id/buttonUseExistingMap"
+        tools:ignore="MissingConstraints"
+        tools:layout_editor_absoluteX="-16dp" />
+
     <TextView
         android:id="@+id/textView"
         android:layout_width="match_parent"
