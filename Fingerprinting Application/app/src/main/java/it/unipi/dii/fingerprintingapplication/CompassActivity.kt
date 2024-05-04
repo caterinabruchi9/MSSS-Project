@@ -30,6 +30,13 @@ class CompassActivity : AppCompatActivity(), SensorEventListener {
         sensorManager = getSystemService(SENSOR_SERVICE) as SensorManager
         magnetometer = sensorManager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD)
         accelerometer = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER)
+
+        val buttonGetAzimuth = findViewById<Button>(R.id.orientationButton)
+
+        buttonGetAzimuth.setOnClickListener {
+            // Trigger azimuth calculation when the button is clicked
+            calculateAzimuth()
+        }
     }
 
     override fun onResume() {
@@ -82,6 +89,12 @@ class CompassActivity : AppCompatActivity(), SensorEventListener {
         val correctedAzimuth = if (azimuthDegrees < 0) azimuthDegrees + 360 else azimuthDegrees
 
         // Print or use the corrected azimuth
-        println("Azimuth: $correctedAzimuth")
+        val textViewAzimuth = findViewById<TextView>(R.id.orientationResult)
+        textViewAzimuth.text = "Azimuth: $correctedAzimuth"
+    }
+
+    private fun calculateAzimuth() {
+        // Trigger the calculation of azimuth
+        updateOrientationAngles()
     }
 }
