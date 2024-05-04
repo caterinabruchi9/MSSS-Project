@@ -1,3 +1,6 @@
+package it.unipi.dii.fingerprintingapplication
+
+
 import android.annotation.SuppressLint
 import android.hardware.Sensor
 import android.hardware.SensorEvent
