@@ -16,44 +16,43 @@ class CompassActivity : AppCompatActivity(), SensorEventListener {
 
     private lateinit var sensorManager: SensorManager
     private var magnetometer: Sensor? = null
+    private var accelerometer: Sensor? = null
 
-    private lateinit var textViewCompass: TextView
-    private lateinit var buttonCompass: Button
-
-    private var isListening = false
+    private val accelerometerReading = FloatArray(3)
+    private val magnetometerReading = FloatArray(3)
+    private val rotationMatrix = FloatArray(9)
+    private val orientationAngles = FloatArray(3)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_compass)
-
-        textViewCompass = findViewById(R.id.orientationResult)
-        buttonCompass = findViewById(R.id.orientationButton)
+        setContentView(R.layout.activity_main)
 
         sensorManager = getSystemService(SENSOR_SERVICE) as SensorManager
         magnetometer = sensorManager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD)
-
-        buttonCompass.setOnClickListener {
-            if (!isListening) {
-                startListening()
-                buttonCompass.text = "Stop"
-            } else {
-                stopListening()
-                buttonCompass.text = "Start"
-            }
-            isListening = !isListening
-        }
+        accelerometer = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER)
     }
 
     override fun onResume() {
         super.onResume()
-        if (isListening) {
-            sensorManager.registerListener(this, magnetometer, SensorManager.SENSOR_DELAY_NORMAL)
+        magnetometer?.also { magSensor ->
+            sensorManager.registerListener(
+                this,
+                magSensor,
+                SensorManager.SENSOR_DELAY_NORMAL
+            )
+        }
+        accelerometer?.also { accelSensor ->
+            sensorManager.registerListener(
+                this,
+                accelSensor,
+                SensorManager.SENSOR_DELAY_NORMAL
+            )
         }
     }
 
     override fun onPause() {
         super.onPause()
-        stopListening()
+        sensorManager.unregisterListener(this)
     }
 
     override fun onAccuracyChanged(sensor: Sensor?, accuracy: Int) {
@@ -61,27 +60,28 @@ class CompassActivity : AppCompatActivity(), SensorEventListener {
     }
 
     override fun onSensorChanged(event: SensorEvent?) {
-        if (event?.sensor?.type == Sensor.TYPE_MAGNETIC_FIELD) {
-            val azimuth = calculateAzimuth(event.values[0], event.values[1])
-            updateUI(azimuth)
-            stopListening()
+        if (event == null) return
+
+        if (event.sensor.type == Sensor.TYPE_ACCELEROMETER) {
+            System.arraycopy(event.values, 0, accelerometerReading, 0, accelerometerReading.size)
+        } else if (event.sensor.type == Sensor.TYPE_MAGNETIC_FIELD) {
+            System.arraycopy(event.values, 0, magnetometerReading, 0, magnetometerReading.size)
         }
+
+        updateOrientationAngles()
     }
 
-    private fun calculateAzimuth(x: Float, y: Float): Float {
-        return Math.toDegrees(Math.atan2(y.toDouble(), x.toDouble())).toFloat()
-    }
+    private fun updateOrientationAngles() {
+        SensorManager.getRotationMatrix(rotationMatrix, null, accelerometerReading, magnetometerReading)
+        SensorManager.getOrientation(rotationMatrix, orientationAngles)
 
-    @SuppressLint("SetTextI18n")
-    private fun updateUI(azimuth: Float) {
-        textViewCompass.text = "Azimuth: $azimuth°"
-    }
+        // Convert azimuth from radians to degrees
+        val azimuthDegrees = Math.toDegrees(orientationAngles[0].toDouble()).toFloat()
 
-    private fun startListening() {
-        sensorManager.registerListener(this, magnetometer, SensorManager.SENSOR_DELAY_NORMAL)
-    }
+        // Ensure azimuthDegrees is between 0 and 360
+        val correctedAzimuth = if (azimuthDegrees < 0) azimuthDegrees + 360 else azimuthDegrees
 
-    private fun stopListening() {
-        sensorManager.unregisterListener(this)
+        // Print or use the corrected azimuth
+        println("Azimuth: $correctedAzimuth")
     }
 }
