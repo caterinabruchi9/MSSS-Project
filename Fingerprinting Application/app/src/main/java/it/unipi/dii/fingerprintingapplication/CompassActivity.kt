@@ -1,7 +1,5 @@
 package it.unipi.dii.fingerprintingapplication
 
-
-import android.annotation.SuppressLint
 import android.hardware.Sensor
 import android.hardware.SensorEvent
 import android.hardware.SensorEventListener
@@ -23,6 +21,8 @@ class CompassActivity : AppCompatActivity(), SensorEventListener {
     private val rotationMatrix = FloatArray(9)
     private val orientationAngles = FloatArray(3)
 
+    private lateinit var buttonGetAzimuth: Button
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_compass)
@@ -31,16 +31,18 @@ class CompassActivity : AppCompatActivity(), SensorEventListener {
         magnetometer = sensorManager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD)
         accelerometer = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER)
 
-        val buttonGetAzimuth = findViewById<Button>(R.id.orientationButton)
+        buttonGetAzimuth = findViewById<Button>(R.id.orientationButton)
 
         buttonGetAzimuth.setOnClickListener {
             // Trigger azimuth calculation when the button is clicked
-            calculateAzimuth()
+            startAzimuthSampling()
         }
     }
 
-    override fun onResume() {
-        super.onResume()
+    private fun startAzimuthSampling() {
+        buttonGetAzimuth.isEnabled = false // Disable the button during sampling
+
+        // Register sensor listeners
         magnetometer?.also { magSensor ->
             sensorManager.registerListener(
                 this,
@@ -59,7 +61,12 @@ class CompassActivity : AppCompatActivity(), SensorEventListener {
 
     override fun onPause() {
         super.onPause()
-        sensorManager.unregisterListener(this)
+        stopAzimuthSampling()
+    }
+
+    private fun stopAzimuthSampling() {
+        sensorManager.unregisterListener(this) // Unregister sensor listeners
+        buttonGetAzimuth.isEnabled = true // Re-enable the button after sampling
     }
 
     override fun onAccuracyChanged(sensor: Sensor?, accuracy: Int) {
@@ -76,6 +83,7 @@ class CompassActivity : AppCompatActivity(), SensorEventListener {
         }
 
         updateOrientationAngles()
+        stopAzimuthSampling() // Stop sampling after obtaining orientation
     }
 
     private fun updateOrientationAngles() {
@@ -88,13 +96,8 @@ class CompassActivity : AppCompatActivity(), SensorEventListener {
         // Ensure azimuthDegrees is between 0 and 360
         val correctedAzimuth = if (azimuthDegrees < 0) azimuthDegrees + 360 else azimuthDegrees
 
-        // Print or use the corrected azimuth
+        // Update TextView with the corrected azimuth
         val textViewAzimuth = findViewById<TextView>(R.id.orientationResult)
         textViewAzimuth.text = "Azimuth: $correctedAzimuth"
-    }
-
-    private fun calculateAzimuth() {
-        // Trigger the calculation of azimuth
-        updateOrientationAngles()
     }
 }
