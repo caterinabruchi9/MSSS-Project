@@ -105,4 +105,18 @@ class CompassActivity : AppCompatActivity(), SensorEventListener {
         // Update TextView with the corrected azimuth
         textViewAzimuth.text = "Azimuth: $correctedAzimuth"
     }
+
+
+    private fun calculateOrientation(reference: Float, measured: Float){
+
+        if (measured > (reference+315)%360 && measured < (reference+45)%360)
+            println("Sei dritto rispetto alla direzione di riferimento")
+        else if (measured < (reference+225)%360 && measured > (reference+135)%360)
+            println("Sei al contrario rispetto alla direzione di riferimento")
+        else if (measured < (reference+135)%360 && measured > (reference+45)%360)
+            println("Sei girato verso destra")
+        else println("Sei girato verso sinistra")
+
+
+    }
 }
