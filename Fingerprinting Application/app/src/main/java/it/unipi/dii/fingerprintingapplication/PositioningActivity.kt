@@ -21,9 +21,12 @@ import retrofit2.Response
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import com.google.gson.JsonArray
+import kotlin.time.Duration.Companion.milliseconds
+import kotlin.time.Duration.Companion.nanoseconds
+import kotlin.time.Duration.Companion.seconds
 
 class PositioningActivity : AppCompatActivity() {
-
+    private var count: Int = 0;
     private lateinit var textViewPosition: TextView
     private lateinit var buttonCalculatePosition: Button
     private lateinit var wifiScanner: WifiScanner
@@ -49,9 +52,13 @@ class PositioningActivity : AppCompatActivity() {
 
 
     private fun performScanAndCalculatePosition() {
+        count++;
+        buttonCalculatePosition.isActivated = false // Disabilita il bottone
+        wifiScanner.wifiScanResults.removeObservers(this)  // Rimuovi gli osservatori precedenti
         wifiScanner.startScan()  // Avvia la scansione WiFi
-        observeScanResults()     // Osserva i risultati della scansione e calcola la posizione
+        observeScanResults()     // Aggiungi un nuovo osservatore
     }
+
 
     private fun observeScanResults() {
         wifiScanner.wifiScanResults.observe(this, Observer { scanResults ->
@@ -59,8 +66,15 @@ class PositioningActivity : AppCompatActivity() {
                 Fingerprint(it.SSID, it.BSSID, it.frequency, it.level)
             }
             val currentSample = Sample(0, 0, currentFingerprints.toMutableList())
+            val start = System.nanoTime()
             val nearestSample = currentSample.findNearestSample(this, serverFingerprints)
-            textViewPosition.text = "Nearest Position: Zone: ${nearestSample?.first}, Sample: ${nearestSample?.second}"
+            val end = System.nanoTime()
+            buttonCalculatePosition.isActivated = true
+            textViewPosition.text = "Nearest Position: Zone: ${nearestSample.first.first}, " +
+                    "Sample: ${nearestSample.first.second}\n" +
+                    "Distance: ${nearestSample.second}\n"+
+                    "Computation time: ${(end.nanoseconds - start.nanoseconds)}\n" +
+                    "Count: ${count}"
         })
     }
     private fun fetchFingerprints(mapId: Int) {

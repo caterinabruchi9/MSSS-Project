@@ -9,19 +9,34 @@ import android.content.Context
 
 
 
-class Fingerprint(val ssid: String, val bssid: String, val frequency: Int, var rss: Int)
+class Fingerprint(
+    var ssid: String = "unknown",
+    val bssid: String,
+    val frequency: Int,
+    var rss: Int
+) {
+    init {
+        if (this.ssid.isBlank()) this.ssid = "unknown"
+    }
+}
+
+
 
 
 class Sample(val zona: Int, val sample: Int, val fingerprints: MutableList<Fingerprint>){
     fun euclideanDistance(other: Sample): Double {
         val commonFingerprints = mutableListOf<Pair<Fingerprint, Fingerprint>>()
+        //val fakeFingerprints = mutableListOf<Pair<Fingerprint, Fingerprint>>()
 
         // Finding common fingerprints based on matching BSSID and frequency
         for (fp1 in this.fingerprints) {
             for (fp2 in other.fingerprints) {
-                if (fp1.bssid == fp2.bssid && fp1.frequency == fp2.frequency) {
+                if (fp1.bssid == fp2.bssid) {
                     commonFingerprints.add(fp1 to fp2)
                     break
+               // }else{
+                //    fakeFingerprints.add(fp1 to fp2)
+                  //  break
                 }
             }
         }
@@ -33,22 +48,29 @@ class Sample(val zona: Int, val sample: Int, val fingerprints: MutableList<Finge
             sum += diff.toDouble().pow(2)
         }
 
+       /* for (i in fakeFingerprints) {
+            val diff = 40
+            sum += diff.toDouble().pow(2)
+        }*/
+
+
         return sqrt(sum)
     }
 
-    fun findNearestSample(context: Context, samples: List<Sample>): Pair<Int, Int>? {
+    fun findNearestSample(context: Context, samples: List<Sample>): Pair<Pair<Int, Int>, Double> {
         var minDistance = Double.MAX_VALUE
-        var nearestSample: Pair<Int, Int>? = null
-
+        var nearestSample: Pair<Int, Int> = -1 to -1
+        var results: Pair<Pair<Int,Int>,Double> = nearestSample to minDistance
         for (sample in samples) {
             val distance = this.euclideanDistance(sample)
             if (distance < minDistance) {
                 minDistance = distance
                 nearestSample = sample.zona to sample.sample
+                results= nearestSample to minDistance
             }
         }
 
-        return nearestSample
+        return  results
     }
 
 
