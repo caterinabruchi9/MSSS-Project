@@ -23,59 +23,39 @@ class Fingerprint(
 
 
 
-class Sample(val zona: Int, val sample: Int, val fingerprints: MutableList<Fingerprint>){
-    fun euclideanDistance(other: Sample): Double {
-        val commonFingerprints = mutableListOf<Pair<Fingerprint, Fingerprint>>()
-        //val fakeFingerprints = mutableListOf<Pair<Fingerprint, Fingerprint>>()
-
-        // Finding common fingerprints based on matching BSSID and frequency
-        for (fp1 in this.fingerprints) {
-            for (fp2 in other.fingerprints) {
-                if (fp1.bssid == fp2.bssid) {
-                    commonFingerprints.add(fp1 to fp2)
-                    break
-               // }else{
-                //    fakeFingerprints.add(fp1 to fp2)
-                  //  break
-                }
-            }
+class Sample(val zona: Int, val sample: Int, val fingerprints: MutableList<Fingerprint>) {
+    fun euclideanDistance(other: Sample, allBssids: Set<String>): Double {
+        val rssVector1 = allBssids.map { bssid ->
+            fingerprints.find { it.bssid == bssid }?.rss
+                ?: -100 // Imposta RSS -100 se BSSID non presente
+        }
+        val rssVector2 = allBssids.map { bssid ->
+            other.fingerprints.find { it.bssid == bssid }?.rss
+                ?: -100 // Imposta RSS -100 se BSSID non presente
         }
 
-        // Calculating Euclidean distance using common fingerprints
-        var sum = 0.0
-        for ((fp1, fp2) in commonFingerprints) {
-            val diff = fp1.rss - fp2.rss
-            sum += diff.toDouble().pow(2)
-        }
-
-       /* for (i in fakeFingerprints) {
-            val diff = 40
-            sum += diff.toDouble().pow(2)
-        }*/
-
-
-        return sqrt(sum)
+        // Calcolo della distanza euclidea
+        return sqrt(rssVector1.zip(rssVector2).sumOf { (rss1, rss2) ->
+            (rss1 - rss2).toDouble().pow(2)
+        })
     }
 
-    fun findNearestSample(context: Context, samples: List<Sample>): Pair<Pair<Int, Int>, Double> {
+    // Trova il campione più vicino data una lista di campioni e un set completo di BSSID
+    fun findNearestSample(samples: List<Sample>, allBssids: Set<String>): Pair<Pair<Int, Int>, Double> {
         var minDistance = Double.MAX_VALUE
-        var nearestSample: Pair<Int, Int> = -1 to -1
-        var results: Pair<Pair<Int,Int>,Double> = nearestSample to minDistance
+        var nearestSample: Pair<Int, Int>? = null
+
         for (sample in samples) {
-            val distance = this.euclideanDistance(sample)
+            val distance = this.euclideanDistance(sample, allBssids)
             if (distance < minDistance) {
                 minDistance = distance
                 nearestSample = sample.zona to sample.sample
-                results= nearestSample to minDistance
             }
         }
 
-        return  results
-    }
-
+        return (nearestSample ?: (0 to 0)) to minDistance    }
 
 }
-
 data class Map(val list: List<Sample>)
 
 

@@ -31,6 +31,7 @@ class PositioningActivity : AppCompatActivity() {
     private lateinit var buttonCalculatePosition: Button
     private lateinit var wifiScanner: WifiScanner
     private var serverFingerprints: List<Sample> = emptyList()  // Memorizza i fingerprint come una lista di Sample
+    private lateinit var allBssids: Set<String>
 
     private lateinit var textViewFingerprintDetails: TextView
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -41,6 +42,8 @@ class PositioningActivity : AppCompatActivity() {
         textViewFingerprintDetails = findViewById(R.id.textViewFingerprintDetails)
         buttonCalculatePosition = findViewById(R.id.buttonCalculatePosition)
         wifiScanner = WifiScanner(this)
+
+
 
         val mapId = intent.getIntExtra("MAP_ID", 0)
         fetchFingerprints(mapId)
@@ -67,16 +70,13 @@ class PositioningActivity : AppCompatActivity() {
             }
             val currentSample = Sample(0, 0, currentFingerprints.toMutableList())
             val start = System.nanoTime()
-            val nearestSample = currentSample.findNearestSample(this, serverFingerprints)
+            val nearestSample = currentSample.findNearestSample(serverFingerprints, allBssids)
             val end = System.nanoTime()
-            buttonCalculatePosition.isActivated = true
-            textViewPosition.text = "Nearest Position: Zone: ${nearestSample.first.first}, " +
-                    "Sample: ${nearestSample.first.second}\n" +
-                    "Distance: ${nearestSample.second}\n"+
-                    "Computation time: ${(end.nanoseconds - start.nanoseconds)}\n" +
-                    "Count: ${count}"
+            buttonCalculatePosition.isEnabled = true  // Riabilita il bottone
+            textViewPosition.text = "Nearest Position: Zone: ${nearestSample.first.first}, Sample: ${nearestSample.first.second}\nDistance: ${nearestSample.second}\nComputation time: ${(end - start) / 1_000_000} ms"
         })
     }
+
     private fun fetchFingerprints(mapId: Int) {
         RetrofitClient.service.getFingerprintsForMap(mapId).enqueue(object : Callback<ResponseBody> {
             override fun onResponse(call: Call<ResponseBody>, response: Response<ResponseBody>) {
@@ -85,6 +85,7 @@ class PositioningActivity : AppCompatActivity() {
                         val json = JsonParser.parseString(responseBody.string()).asJsonObject
                         val fingerprintsJson = json.getAsJsonArray("fingerprints")
                         serverFingerprints = convertToSamples(fingerprintsJson)
+                        allBssids = serverFingerprints.flatMap { it.fingerprints.map { fp -> fp.bssid } }.toSet()
                         textViewPosition.text = "Fingerprints loaded: ${serverFingerprints.size}"
                     }
                 } else {
