@@ -2,6 +2,8 @@ package it.unipi.dii.fingerprintingapplication
 
 import android.Manifest
 import android.content.pm.PackageManager
+import android.hardware.Sensor
+import android.hardware.SensorManager
 import android.os.Bundle
 import android.widget.Button
 import android.widget.EditText
@@ -14,9 +16,12 @@ import androidx.lifecycle.Observer
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
+import android.hardware.SensorEvent
+import android.hardware.SensorEventListener
+
 
 // Main activity class for handling the UI and initiating Wi-Fi scans.
-class ScanActivity : AppCompatActivity() {
+class ScanActivity : AppCompatActivity(), SensorEventListener {
     companion object {
         // Request code for location permission request.
         const val LOCATION_PERMISSION_REQUEST_CODE = 100
@@ -31,6 +36,16 @@ class ScanActivity : AppCompatActivity() {
     private lateinit var buttonSendFingerprint: Button
     private lateinit var textViewStatus: TextView
     private var mapId: Int = 0
+
+    private lateinit var sensorManager: SensorManager
+    private var magnetometer: Sensor? = null
+    private var azimutInDegrees=0.0
+    private var accelerometer: Sensor? = null
+
+    private val accelerometerReading = FloatArray(3)
+    private val magnetometerReading = FloatArray(3)
+    private val rotationMatrix = FloatArray(9)
+    private val orientationAngles = FloatArray(3)
     // Called when the activity is starting.
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -47,6 +62,14 @@ class ScanActivity : AppCompatActivity() {
         buttonSendFingerprint = findViewById(R.id.buttonSendFingerprint)
         buttonSendFingerprint.isEnabled = false
 
+        sensorManager = getSystemService(SENSOR_SERVICE) as SensorManager
+        magnetometer = sensorManager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD)
+        accelerometer = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER)
+        sensorManager.registerListener(this, accelerometer, SensorManager.SENSOR_DELAY_NORMAL)
+        sensorManager.registerListener(this, magnetometer, SensorManager.SENSOR_DELAY_NORMAL)
+
+
+
         // Observes changes in the Wi-Fi scan results and updates the UI accordingly.
         wifiScanner.wifiScanResults.observe(this, Observer { results ->
             val sortedResults = results.sortedWith(compareBy({ it.SSID }, { it.BSSID }))
@@ -56,7 +79,7 @@ class ScanActivity : AppCompatActivity() {
                         "Frequency: ${result.frequency}MHz, " +
                         "Level: ${result.level}dBm, " + '\n'
             }
-            textViewResults.text = resultText
+            textViewResults.text = "${azimutInDegrees}\n" + resultText
             textViewStatus.text = "Scan completed"
             buttonScan.isEnabled = true
         })
@@ -70,7 +93,12 @@ class ScanActivity : AppCompatActivity() {
                 // Triggers the Wi-Fi to toggle and start scanning.
                 //wifiScanner.toggleWifi()
                 //wifiScanner.startScanDelayed()
+                azimutInDegrees = Math.toDegrees(orientationAngles[0].toDouble()) // Converti in gradi
+                if (azimutInDegrees < 0)
+                    azimutInDegrees += 360
                 wifiScanner.startScan()
+
+
             } else {
                 // Requests the necessary permissions if not already granted.
                 ActivityCompat.requestPermissions(
@@ -86,6 +114,21 @@ class ScanActivity : AppCompatActivity() {
         }
     }
 
+    override fun onSensorChanged(event: SensorEvent?) {
+        if (event?.sensor?.type == Sensor.TYPE_ACCELEROMETER) {
+            System.arraycopy(event.values, 0, accelerometerReading, 0, accelerometerReading.size)
+        } else if (event?.sensor?.type == Sensor.TYPE_MAGNETIC_FIELD) {
+            System.arraycopy(event.values, 0, magnetometerReading, 0, magnetometerReading.size)
+        }
+
+        SensorManager.getRotationMatrix(rotationMatrix, null, accelerometerReading, magnetometerReading)
+        SensorManager.getOrientation(rotationMatrix, orientationAngles)
+        // orientationAngles[0] contiene l'azimut in radianti
+    }
+
+    override fun onAccuracyChanged(sensor: Sensor?, accuracy: Int) {
+        // Qui puoi gestire i cambiamenti di accuratezza del sensore se necessario
+    }
     // Checks if the location permission has been granted.
     private fun checkLocationPermission(): Boolean {
         return ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED
@@ -112,7 +155,15 @@ class ScanActivity : AppCompatActivity() {
         super.onDestroy()
         wifiScanner.unregisterReceiver() // Unregister receiver to avoid memory leaks
     }
-
+    override fun onResume() {
+        super.onResume()
+        sensorManager.registerListener(this, accelerometer, SensorManager.SENSOR_DELAY_NORMAL)
+        sensorManager.registerListener(this, magnetometer, SensorManager.SENSOR_DELAY_NORMAL)
+    }
+    override fun onPause() {
+        super.onPause()
+        sensorManager.unregisterListener(this)
+    }
     private fun sendFingerprintData() {
         val areaId = editTextIdArea.text.toString()
         val coordinates = editTextCoordinates.text.toString()
@@ -122,6 +173,8 @@ class ScanActivity : AppCompatActivity() {
             return
         }
 
+
+
         wifiScanner.wifiScanResults.value?.forEach { scanResult ->
             val fingerprintData = FingerprintData(
                 ssid = scanResult.SSID,
@@ -129,8 +182,9 @@ class ScanActivity : AppCompatActivity() {
                 bssid = scanResult.BSSID,
                 mapId = mapId,
                 frequency = scanResult.frequency,
-                zone = areaId.toInt(),  // Assicurati che questi campi siano numerici e gestisci eventuali errori di conversione
-                sample = coordinates.toInt()
+                zone = editTextIdArea.text.toString().toInt(),
+                sample = editTextCoordinates.text.toString().toInt(),
+                azimut = azimutInDegrees
             )
 
             RetrofitClient.service.sendFingerprint(fingerprintData).enqueue(object : Callback<FingerprintResponse> {

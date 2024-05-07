@@ -52,7 +52,9 @@ data class FingerprintData(
     @SerializedName("map-id") val mapId: Int,
     @SerializedName("frequency") val frequency: Int,
     @SerializedName("zone") val zone: Int,
-    @SerializedName("sample") val sample: Int
+    @SerializedName("sample") val sample: Int,
+    @SerializedName("azimut") val azimut: Double,
+
 )
 
 data class FullFingerprint(
