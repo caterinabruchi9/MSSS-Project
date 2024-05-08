@@ -10,6 +10,10 @@ import android.content.Intent
 import android.app.AlertDialog
 import android.content.Context
 import android.content.DialogInterface
+import android.hardware.Sensor
+import android.hardware.SensorEvent
+import android.hardware.SensorEventListener
+import android.hardware.SensorManager
 import android.net.wifi.WifiManager
 import android.widget.EditText
 import android.widget.Toast
@@ -25,7 +29,15 @@ import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.nanoseconds
 import kotlin.time.Duration.Companion.seconds
 
-class PositioningActivity : AppCompatActivity() {
+class PositioningActivity : AppCompatActivity(), SensorEventListener {
+
+    private lateinit var sensorManager: SensorManager
+    private var accelerometer: Sensor? = null
+    private var magnetometer: Sensor? = null
+    private val gravity = FloatArray(3)
+    private val geomagnetic = FloatArray(3)
+    private val rotationMatrix = FloatArray(9)
+    private val orientationAngles = FloatArray(3)
     private var count: Int = 0;
     private lateinit var textViewPosition: TextView
     private lateinit var buttonCalculatePosition: Button
@@ -33,6 +45,7 @@ class PositioningActivity : AppCompatActivity() {
     private var serverFingerprints: List<Sample> = emptyList()  // Memorizza i fingerprint come una lista di Sample
     private lateinit var allBssids: Set<String>
 
+    private var positionInfoList: List<DirectionInfo> = emptyList()
     private lateinit var textViewFingerprintDetails: TextView
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -43,16 +56,47 @@ class PositioningActivity : AppCompatActivity() {
         buttonCalculatePosition = findViewById(R.id.buttonCalculatePosition)
         wifiScanner = WifiScanner(this)
 
+        sensorManager = getSystemService(SENSOR_SERVICE) as SensorManager
+        accelerometer = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER)
+        magnetometer = sensorManager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD)
+
+        sensorManager?.registerListener(this, accelerometer, SensorManager.SENSOR_DELAY_NORMAL)
+        sensorManager?.registerListener(this, magnetometer, SensorManager.SENSOR_DELAY_NORMAL)
+
 
 
         val mapId = intent.getIntExtra("MAP_ID", 0)
         fetchFingerprints(mapId)
+        fetchPositionInformation(mapId)
 
         buttonCalculatePosition.setOnClickListener {
             performScanAndCalculatePosition()
         }
+
     }
 
+    override fun onSensorChanged(event: SensorEvent) {
+        if (event.sensor.type == Sensor.TYPE_ACCELEROMETER) {
+            System.arraycopy(event.values, 0, gravity, 0, gravity.size)
+        } else if (event.sensor.type == Sensor.TYPE_MAGNETIC_FIELD) {
+            System.arraycopy(event.values, 0, geomagnetic, 0, geomagnetic.size)
+        }
+        updateOrientationAngles()
+    }
+    private fun updateOrientationAngles() {
+        SensorManager.getRotationMatrix(rotationMatrix, null, gravity, geomagnetic)
+        SensorManager.getOrientation(rotationMatrix, orientationAngles)
+    }
+    override fun onAccuracyChanged(sensor: Sensor?, accuracy: Int) {
+        // Implement if needed
+    }
+
+    private fun measureAzimuth(): Float {
+        var azimut=  Math.toDegrees(orientationAngles[0].toDouble()).toFloat()
+        azimut = if (azimut < 0) azimut + 360 else azimut
+        return azimut
+
+    }
 
     private fun performScanAndCalculatePosition() {
         count++;
@@ -69,13 +113,57 @@ class PositioningActivity : AppCompatActivity() {
                 Fingerprint(it.SSID, it.BSSID, it.frequency, it.level)
             }
             val currentSample = Sample(0, 0, currentFingerprints.toMutableList())
-            val start = System.nanoTime()
             val nearestSample = currentSample.findNearestSample(serverFingerprints, allBssids)
-            val end = System.nanoTime()
-            buttonCalculatePosition.isEnabled = true  // Riabilita il bottone
-            textViewPosition.text = "Nearest Position: Zone: ${nearestSample.first.first}, Sample: ${nearestSample.first.second}\nDistance: ${nearestSample.second}\nComputation time: ${(end - start) / 1_000_000} ms"
+            val azimuthMeasured = measureAzimuth()
+
+            val matchedInfo = positionInfoList.find {
+                Math.abs(it.azimuth - azimuthMeasured) < 90 &&
+                        it.zone == nearestSample.first.first &&
+                        it.sample == nearestSample.first.second
+            }
+
+            textViewPosition.text = "${azimuthMeasured}\n Nearest Position: Zone: ${nearestSample.first.first}, Sample: ${nearestSample.first.second}\n" +
+                    "Info: ${matchedInfo?.info ?: "No matching info found"}"
         })
     }
+
+
+
+
+    private fun fetchPositionInformation(mapId: Int) {
+        RetrofitClient.service.getPositionInformation(mapId).enqueue(object : Callback<PositionResponse> {
+            override fun onResponse(call: Call<PositionResponse>, response: Response<PositionResponse>) {
+                if (response.isSuccessful && response.body() != null) {
+                    val responseBody = response.body()!!
+                    positionInfoList = responseBody.directions.map { list ->
+                        DirectionInfo(
+                            zone = (list[0] as Double).toInt(),
+                            sample = (list[1] as Double).toInt(),
+                            azimuth = list[2] as Double,
+                            info = list[3] as String
+                        )
+                    }
+                    val mapDetails = responseBody.map
+                    val mapId = (mapDetails[0] as Double).toInt()
+                    val buildingName = mapDetails[1] as String
+                    val rooms = (mapDetails[2] as Double).toInt()
+                    val latitude = mapDetails[3] as Double
+                    val longitude = mapDetails[4] as Double
+
+                    println("Position information loaded: ${positionInfoList.size} entries")
+                } else {
+                    println("Failed to fetch position information: ${response.code()}")
+                }
+            }
+
+            override fun onFailure(call: Call<PositionResponse>, t: Throwable) {
+                println( "Error fetching position information: ${t.message}")
+            }
+        })
+    }
+
+
+
 
     private fun fetchFingerprints(mapId: Int) {
         RetrofitClient.service.getFingerprintsForMap(mapId).enqueue(object : Callback<ResponseBody> {
@@ -122,7 +210,19 @@ class PositioningActivity : AppCompatActivity() {
         return samples.map { Sample(it.key.first, it.key.second, it.value) }
     }
 
-
+    override fun onResume() {
+        super.onResume()
+        accelerometer?.also { accel ->
+            sensorManager.registerListener(this, accel, SensorManager.SENSOR_DELAY_UI)
+        }
+        magnetometer?.also { mag ->
+            sensorManager.registerListener(this, mag, SensorManager.SENSOR_DELAY_UI)
+        }
+    }
+    override fun onPause() {
+        super.onPause()
+        sensorManager.unregisterListener(this)
+    }
 
     override fun onDestroy() {
         super.onDestroy()

@@ -1,14 +1,18 @@
 package it.unipi.dii.fingerprintingapplication
 
 
+import android.Manifest
 import android.content.Intent
 import android.os.Bundle
 import android.widget.Button
 import androidx.appcompat.app.AppCompatActivity
 import android.app.AlertDialog
 import android.content.DialogInterface
+import android.content.pm.PackageManager
 import android.widget.EditText
 import android.widget.Toast
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 import com.google.gson.JsonParser
 import okhttp3.ResponseBody
 import retrofit2.Call
@@ -26,6 +30,15 @@ class MainActivity : AppCompatActivity() {
         val buttonCreateNewMap = findViewById<Button>(R.id.buttonCreateNewMap)
         editTextServerSubdomain = findViewById(R.id.editTextServerAddress)
         buttonChangeServerAddress = findViewById(R.id.buttonChangeServerAddress)
+
+        if (!checkLocationPermission()) {
+            // Requests the necessary permissions if not already granted.
+            ActivityCompat.requestPermissions(
+                this,
+                arrayOf(Manifest.permission.ACCESS_FINE_LOCATION),
+                ScanActivity.LOCATION_PERMISSION_REQUEST_CODE
+            )
+        }
         buttonCreateNewMap.setOnClickListener {
 
 
@@ -60,7 +73,20 @@ class MainActivity : AppCompatActivity() {
 
     }
 
+    private fun checkLocationPermission(): Boolean {
+        return ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED
+    }
 
+    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        if (requestCode == ScanActivity.LOCATION_PERMISSION_REQUEST_CODE) {
+            if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+
+            } else {
+                //GESTIRE IL CASO IN CUI IL PERMESSO VIENE NEGATO
+            }
+        }
+    }
 
     private fun fetchMapsAndShowDialog() {
         RetrofitClient.service.getMaps().enqueue(object : Callback<ResponseBody> {
