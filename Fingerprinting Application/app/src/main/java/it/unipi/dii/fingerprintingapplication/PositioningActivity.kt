@@ -45,6 +45,15 @@ class PositioningActivity : AppCompatActivity(), SensorEventListener {
     private var serverFingerprints: List<Sample> = emptyList()  // Memorizza i fingerprint come una lista di Sample
     private lateinit var allBssids: Set<String>
 
+    private val handler = android.os.Handler()
+    private val updateRunnable = object : Runnable {
+        override fun run() {
+            performScanAndCalculatePosition()
+            handler.postDelayed(this, 100) // Esegui ogni 100 ms
+        }
+    }
+
+
     private var positionInfoList: List<DirectionInfo> = emptyList()
     private lateinit var textViewFingerprintDetails: TextView
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -70,7 +79,7 @@ class PositioningActivity : AppCompatActivity(), SensorEventListener {
         fetchPositionInformation(mapId)
 
         buttonCalculatePosition.setOnClickListener {
-            performScanAndCalculatePosition()
+            handler.post(updateRunnable)
         }
 
     }
@@ -116,8 +125,10 @@ class PositioningActivity : AppCompatActivity(), SensorEventListener {
             val nearestSample = currentSample.findNearestSample(serverFingerprints, allBssids)
             val azimuthMeasured = measureAzimuth()
 
+            val treshold= if(nearestSample.first.first==4 || nearestSample.first.first==6) 45 else 90
+
             val matchedInfo = positionInfoList.find {
-                Math.abs(it.azimuth - azimuthMeasured) < 90 &&
+                Math.abs(it.azimuth - azimuthMeasured) < treshold &&
                         it.zone == nearestSample.first.first &&
                         it.sample == nearestSample.first.second
             }
@@ -221,11 +232,15 @@ class PositioningActivity : AppCompatActivity(), SensorEventListener {
     }
     override fun onPause() {
         super.onPause()
+        handler.removeCallbacks(updateRunnable)
         sensorManager.unregisterListener(this)
+        wifiScanner.unregisterReceiver()
     }
 
     override fun onDestroy() {
         super.onDestroy()
+        handler.removeCallbacks(updateRunnable)
+        sensorManager.unregisterListener(this)
         wifiScanner.unregisterReceiver()  // Pulisci per evitare memory leaks
     }
 }
