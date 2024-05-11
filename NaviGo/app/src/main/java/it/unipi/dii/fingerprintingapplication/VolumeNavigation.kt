@@ -64,8 +64,11 @@ open class VolumeNavigation : AppCompatActivity(), TextToSpeech.OnInitListener {
 
 
     private fun selectCurrentButton() {
+        val selectedButtonText = buttons[selectedButtonIndex].text.toString()
+        speak(selectedButtonText) // Speak the button's text
         buttons[selectedButtonIndex].performClick() // Perform the click event on the selected button
     }
+
 
     private fun speak(text: String) {
         if (::tts.isInitialized) {
