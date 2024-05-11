@@ -10,7 +10,6 @@ import java.util.*
 
 // Base class for volume-based navigation with Text-to-Speech
 open class VolumeNavigation : AppCompatActivity(), TextToSpeech.OnInitListener {
-    private var lastVolumeUpPressTime = 0L
     private var selectedButtonIndex = 0
     protected lateinit var buttons: List<Button> // Accessible to subclasses
     private lateinit var tts: TextToSpeech // Text-to-Speech instance
@@ -35,12 +34,7 @@ open class VolumeNavigation : AppCompatActivity(), TextToSpeech.OnInitListener {
         return super.onKeyDown(keyCode, event)
     }
 
-    private fun navigateDown() {
-        if (::buttons.isInitialized && buttons.isNotEmpty()) {
-            selectedButtonIndex = (selectedButtonIndex + 1) % buttons.size
-            selectButton(selectedButtonIndex) // Select and announce the button
-        }
-    }
+
 
     private fun navigateUp() {
         if (::buttons.isInitialized && buttons.isNotEmpty()) {
@@ -54,30 +48,20 @@ open class VolumeNavigation : AppCompatActivity(), TextToSpeech.OnInitListener {
     }
 
 
-    private fun handleVolumeUpPress() {
-        val currentTime = System.currentTimeMillis()
-        val doubleTapThreshold = 500 // Time in ms to consider a double-tap
-
-        if (currentTime - lastVolumeUpPressTime <= doubleTapThreshold) {
-            selectCurrentButton() // Double-tap action
-            return
-        } else {
-            navigateUp() // Single-tap action
-        }
-
-        lastVolumeUpPressTime = currentTime
-    }
-
 
     private fun selectButton(index: Int) {
-        buttons.forEach { it.setBackgroundResource(android.R.color.transparent) }
-        buttons[index].setBackgroundResource(android.R.color.holo_blue_light)
-
-        // Speak the button's text
-        speak(buttons[index].text.toString())
+        buttons.forEachIndexed { i, button ->
+            if (i == index) {
+                button.setBackgroundResource(android.R.color.holo_blue_light)
+                speak(button.text.toString()) // Speak the button's text when selected
+            } else {
+                button.setBackgroundResource(android.R.color.transparent)
+            }
+        }
 
         Toast.makeText(this, "Selected button ${index + 1}", Toast.LENGTH_SHORT).show()
     }
+
 
     private fun selectCurrentButton() {
         buttons[selectedButtonIndex].performClick() // Perform the click event on the selected button

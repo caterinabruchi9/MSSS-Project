@@ -1,12 +1,5 @@
-import android.widget.Toast
-import org.apache.commons.csv.CSVFormat
-import org.apache.commons.csv.CSVParser
-import java.io.File
 import kotlin.math.pow
 import kotlin.math.sqrt
-import kotlin.random.Random
-import android.content.Context
-
 
 
 class Fingerprint(
@@ -23,7 +16,7 @@ class Fingerprint(
 
 
 
-class Sample(val zona: Int, val sample: Int, val fingerprints: MutableList<Fingerprint>) {
+class Sample(val zone: Int, val sample: Int, val fingerprints: MutableList<Fingerprint>) {
     fun euclideanDistance(other: Sample, allBssids: Set<String>): Double {
         val rssVector1 = allBssids.map { bssid ->
             fingerprints.find { it.bssid == bssid }?.rss
@@ -49,7 +42,7 @@ class Sample(val zona: Int, val sample: Int, val fingerprints: MutableList<Finge
             val distance = this.euclideanDistance(sample, allBssids)
             if (distance < minDistance) {
                 minDistance = distance
-                nearestSample = sample.zona to sample.sample
+                nearestSample = sample.zone to sample.sample
             }
         }
 
