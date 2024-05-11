@@ -1,0 +1,239 @@
+---
+swagger: "2.0"
+info:
+  description: "Indoor Positioning backend"
+  version: "1.0.0"
+  title: "Indoor Positioning backend"
+host: "127.0.0.1:8080"
+basePath: "/"
+tags:
+- name: "fingerprints"
+  description: "Wi-Fi fingerprint collection"
+- name: "maps"
+  description: "Wi-Fi maps"
+schemes:
+- "http"
+paths:
+  /fingerprint:
+    post:
+      tags:
+      - "fingerprints"
+      summary: "Add a new Wi-Fi fingerprint"
+      operationId: "add_fingerprint"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - in: "body"
+        name: "body"
+        description: "Wi-Fi fingerprint data"
+        required: true
+        schema:
+          $ref: "#/definitions/Fingerprint"
+      responses:
+        "404":
+          description: "Invalid input"
+      x-swagger-router-controller: "swagger_server.controllers.fingerprints_controller"
+  /direction:
+    post:
+      tags:
+      - "directions"
+      operationId: "add_direction"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - in: "body"
+        name: "body"
+        description: "Direction data"
+        required: true
+        schema:
+          $ref: "#/definitions/Direction"
+      responses:
+        "404":
+          description: "Invalid input"
+      x-swagger-router-controller: "swagger_server.controllers.directions_controller"
+  /direction/{mapId}:
+    get:
+      tags:
+      - "directions"
+      operationId: "get_directions_by_id"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "mapId"
+        in: "path"
+        description: "ID of Directions to return"
+        required: true
+        type: "integer"
+        format: "int64"
+      responses:
+        "200":
+          description: "successful operation"
+          schema:
+            $ref: "#/definitions/Map"
+        "400":
+          description: "Invalid ID supplied"
+        "404":
+          description: "Directions not found"
+      x-swagger-router-controller: "swagger_server.controllers.directions_controller"
+  /maps/{mapId}:
+    get:
+      tags:
+      - "maps"
+      summary: "Find Map by ID"
+      description: "Returns a single map"
+      operationId: "get_map_by_id"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "mapId"
+        in: "path"
+        description: "ID of Map to return"
+        required: true
+        type: "integer"
+        format: "int64"
+      responses:
+        "200":
+          description: "successful operation"
+          schema:
+            $ref: "#/definitions/Map"
+        "400":
+          description: "Invalid ID supplied"
+        "404":
+          description: "Map not found"
+      x-swagger-router-controller: "swagger_server.controllers.maps_controller"
+  /maps/list:
+    get:
+      tags:
+      - "maps"
+      summary: "Find all the available maps"
+      operationId: "get_maps"
+      produces:
+      - "application/json"
+      parameters: []
+      responses:
+        "200":
+          description: "successful operation"
+        "404":
+          description: "Map not found"
+      x-swagger-router-controller: "swagger_server.controllers.maps_controller"
+  /maps:
+    post:
+      tags:
+      - "maps"
+      summary: "Create a new Map"
+      operationId: "create_map"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - in: "body"
+        name: "body"
+        description: "Map data"
+        required: true
+        schema:
+          $ref: "#/definitions/Map"
+      responses:
+        "200":
+          description: "successful operation"
+        "404":
+          description: "Invalid input"
+      x-swagger-router-controller: "swagger_server.controllers.maps_controller"
+definitions:
+  Fingerprint:
+    type: "object"
+    required:
+    - "bssid"
+    - "RSS"
+    - "frequency"
+    - "map-id"
+    - "zone"
+    - "sample"
+    properties:
+      map-id:
+        type: "integer"
+        format: "int64"
+        example: 934
+      ssid:
+        type: "string"
+        example: "eduroam"
+      bssid:
+        type: "string"
+        example: "00-B0-D0-63-C2-26"
+      RSS:
+        type: "integer"
+        format: "int64"
+        example: -90
+      frequency:
+        type: "integer"
+        format: "int64"
+        example: 2462
+      zone:
+        type: "integer"
+        format: "int64"
+        example: 1
+      sample:
+        type: "integer"
+        format: "int64"
+        example: 1
+    example:
+      RSS: -90
+      map-id: 934
+      ssid: "eduroam"
+      bssid: "00-B0-D0-63-C2-26"
+      frequency: 2462
+      azimmut: 192.5
+      zone: 1
+      sample: 1
+  Map:
+    type: "object"
+    required:
+    - "building-name"
+    - "rooms"
+    properties:
+      map-id:
+        type: "integer"
+        format: "int64"
+        example: 934
+      building-name:
+        type: "string"
+        example: "Scuola d'Ingegneria - Polo A"
+      rooms:
+        type: "integer"
+        format: "int64"
+        example: 2
+    example:
+      rooms: 2
+      building-name: "Scuola d'Ingegneria - Polo A"
+      map-id: 111
+  Direction:
+    type: "object"
+    required:
+    - "map-id"
+    - "zone"
+    - "sample"
+    - "azimut"
+    - "info"
+    properties:
+      map-id:
+        type: "integer"
+        format: "int64"
+        example: 934
+      zone:
+        type: "integer"
+        format: "int64"
+        example: 1
+      sample:
+        type: "integer"
+        format: "int64"
+        example: 1
+      azimut:
+        type: "number"
+        format: "float"
+        example: 192.5
+      info:
+        type: "string"

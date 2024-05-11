@@ -1,0 +1,17 @@
+map_id,zone,sample,azimut,info
+1,1,1,290.0,"Alle tue spalle c'è l'ingresso del dipartimento, alla tua sinistra le scale per il primo piano "
+1,1,1,110.0,"Di fronte a te c'è l'ingresso del dipartimento, alla tua destra le scale per il primo piano"
+1,2,1,290.0,"alla tua destra c'è l'ingresso superiore di aula ADII1, continuando in questa direzione troverai A28"
+1,2,1,110.0,"alla tua sinistra c'è l'ingresso superiore di aula ADII1, continuando in questa direzione troverai il dipartimento "
+1,3,1,290.0,"alla tua destra c'è l'ingresso inferiore di aula ADII1, continuando in questa direzione troverai A28"
+1,3,1,110.0,"alla tua sinistra c'è l'ingresso inferiore di aula ADII1, continuando in questa direzione troverai il dipartimento "
+1,4,1,290.0,"ti trovi all'ingresso di aula a28, procedendo in questa direzione troverai i bagni, ExA27 e le scale per il primo piano"
+1,4,1,20.0,"ti trovi all'ingresso di aula a28, procedendo in questa direzione troverai ADII1 e l'ingresso del dipartimento"
+1,5,1,200.0,"alla tua sinistra troverai l'ingresso dei bagni, a destra le scale d'emergenza"
+1,5,1,20.0,"alla tua destra troverai l'ingresso dei bagni, a sinistra le scale d'emergenza"
+1,6,1,200.0,"alla tua sinistra troverai l'ingresso delle aule professori, a destra l'ascensore le scale per il primo piano"
+1,6,1,110.0,"di fronte a te troverai l'ingresso delle aule professori, a sinistra l'ascensore le scale per il primo piano"
+1,7,1,290.0,alla tua sinistra l'ingresso di exA27 a destra l'ascensore e a dritto le scale per il primo piano
+1,7,1,110.0,alla tua destra l'ingresso di exA27 a sinistra l'ascensore 
+1,8,1,290.0,"continuando dritto troverai l'altra ala del secondo piano, a destra le scale per il primo piano"
+1,8,1,110.0,"continuando in questa direzione troverai A27,ADII1 e il dipartimento"
