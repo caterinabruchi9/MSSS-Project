@@ -125,10 +125,8 @@ class PositioningActivity : AppCompatActivity(), SensorEventListener {
             val nearestSample = currentSample.findNearestSample(serverFingerprints, allBssids)
             val azimuthMeasured = measureAzimuth()
 
-            val treshold= if(nearestSample.first.first==4 || nearestSample.first.first==6) 45 else 90
-
             val matchedInfo = positionInfoList.find {
-                Math.abs(it.azimuth - azimuthMeasured) < treshold &&
+                Math.abs(it.azimuth - azimuthMeasured) < it.threshold &&
                         it.zone == nearestSample.first.first &&
                         it.sample == nearestSample.first.second
             }
@@ -151,7 +149,8 @@ class PositioningActivity : AppCompatActivity(), SensorEventListener {
                             zone = (list[0] as Double).toInt(),
                             sample = (list[1] as Double).toInt(),
                             azimuth = list[2] as Double,
-                            info = list[3] as String
+                            threshold = list[3] as Int,
+                            info = list[4] as String
                         )
                     }
                     val mapDetails = responseBody.map

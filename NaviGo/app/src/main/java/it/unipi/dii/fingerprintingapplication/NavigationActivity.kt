@@ -9,7 +9,6 @@ import android.hardware.Sensor
 import android.hardware.SensorEvent
 import android.hardware.SensorEventListener
 import android.hardware.SensorManager
-import android.os.Looper
 import android.speech.tts.TextToSpeech
 import com.google.gson.JsonArray
 import com.google.gson.JsonParser
@@ -23,8 +22,10 @@ import kotlin.math.abs
 class NavigationActivity : AppCompatActivity(), SensorEventListener {
 
     private lateinit var tts: TextToSpeech
+
     private var currentZone: Pair<Int,Int>? = null
     private var consecutiveSamples: MutableMap<Pair<Int, Int>, Int> = mutableMapOf()
+
     private lateinit var sensorManager: SensorManager
     private var accelerometer: Sensor? = null
     private var magnetometer: Sensor? = null
@@ -33,11 +34,12 @@ class NavigationActivity : AppCompatActivity(), SensorEventListener {
     private val rotationMatrix = FloatArray(9)
     private val orientationAngles = FloatArray(3)
     private lateinit var buttonGetInformation: Button
-    private val handler = android.os.Handler(Looper.getMainLooper())
+
+    private val handler = android.os.Handler()
     private val updateRunnable = object : Runnable {
         override fun run() {
             performScanAndCalculatePosition()
-            handler.postDelayed(this, 100) // Execute every 100 ms
+            handler.postDelayed(this, 250) // Execute every 1000 ms
         }
     }
 
@@ -123,17 +125,19 @@ class NavigationActivity : AppCompatActivity(), SensorEventListener {
             val currentFingerprints = scanResults.map {
                 Fingerprint(it.SSID, it.BSSID, it.frequency, it.level)
             }
+
             val currentSample = Sample(0, 0, currentFingerprints.toMutableList())
             val nearestSample = currentSample.findNearestSample(serverFingerprints, allBssids)
             val azimuthMeasured = measureAzimuth()
 
-            val threshold =
-                if (nearestSample.first.first == 4 || nearestSample.first.first == 6) 45 else 90
+            val nearestZone = nearestSample.first.first
+            val nearestZoneSample = nearestSample.first.second
+
 
             val matchedInfo = positionInfoList.find {
-                abs(it.azimuth - azimuthMeasured) < threshold &&
-                        it.zone == nearestSample.first.first &&
-                        it.sample == nearestSample.first.second
+                abs(it.azimuth - azimuthMeasured) < it.threshold &&
+                        it.zone == nearestZone &&
+                        it.sample == nearestZoneSample
             }
 
             val currentDetectedZone = nearestSample.first
@@ -142,7 +146,7 @@ class NavigationActivity : AppCompatActivity(), SensorEventListener {
             consecutiveSamples[currentDetectedZone] = (consecutiveSamples[currentDetectedZone] ?: 0) + 1
 
             // Check if the consecutive samples threshold is reached
-            if ((consecutiveSamples[currentDetectedZone] ?: 0) >= 3) {
+            if ((consecutiveSamples[currentDetectedZone] ?: 0) >= 5) {
                 // If the detected zone is different from the current zone, update the current zone
                 if (currentZone != currentDetectedZone) {
                     currentZone = currentDetectedZone
@@ -154,9 +158,7 @@ class NavigationActivity : AppCompatActivity(), SensorEventListener {
             }
 
             // Update the position information text on the button
-            val positionText = "Azimuth: $azimuthMeasured\n" +
-                    "Nearest Position: Zone: ${nearestSample.first.first}, Sample: ${nearestSample.first.second}\n" +
-                    "Info: ${matchedInfo?.info ?: "No matching info found"}"
+            val positionText = "${matchedInfo?.info ?: "No matching info found"}"
             buttonGetInformation.text = positionText
         }
     }
@@ -178,7 +180,8 @@ class NavigationActivity : AppCompatActivity(), SensorEventListener {
                             zone = (list[0] as Double).toInt(),
                             sample = (list[1] as Double).toInt(),
                             azimuth = list[2] as Double,
-                            info = list[3] as String
+                            threshold = (list[3] as Double).toInt(),
+                            info = list[4] as String
                         )
                     }
                     println("Position information loaded: ${positionInfoList.size} entries")
@@ -240,7 +243,7 @@ class NavigationActivity : AppCompatActivity(), SensorEventListener {
     }
 
     private fun speak(text: String) {
-        val tts = TextToSpeech(applicationContext) { status ->
+        tts = TextToSpeech(applicationContext) { status ->
             if (status != TextToSpeech.ERROR) {
                 val locale = Locale.getDefault()
                 tts.language = locale

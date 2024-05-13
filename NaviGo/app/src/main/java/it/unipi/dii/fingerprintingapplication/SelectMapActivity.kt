@@ -120,7 +120,7 @@ class SelectMapActivity : VolumeNavigation() {
             // Handle map selection
             val intent = Intent(this@SelectMapActivity, NavigationActivity::class.java)
             // Pass any necessary data to the NavigationActivity using intent extras
-            intent.putExtra("mapId", selectedMap.mapId)
+            intent.putExtra("MAP_ID", selectedMap.mapId)
             startActivity(intent)
         }
 

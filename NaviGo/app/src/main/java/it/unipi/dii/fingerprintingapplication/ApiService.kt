@@ -82,6 +82,7 @@ data class DirectionInfo(
     @SerializedName("zone") val zone: Int,
     @SerializedName("sample") val sample: Int,
     @SerializedName("azimuth") val azimuth: Double,
+    @SerializedName("threshold") val threshold: Int,
     @SerializedName("info") val info: String
 )
 data class PositionResponse(

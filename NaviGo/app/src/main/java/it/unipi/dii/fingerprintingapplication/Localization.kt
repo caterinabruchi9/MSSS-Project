@@ -34,12 +34,12 @@ class Sample(val zone: Int, val sample: Int, val fingerprints: MutableList<Finge
     }
 
     // Trova il campione più vicino data una lista di campioni e un set completo di BSSID
-    fun findNearestSample(samples: List<Sample>, allBssids: Set<String>): Pair<Pair<Int, Int>, Double> {
+    fun findNearestSample(samples: List<Sample>, allBSSIDs: Set<String>): Pair<Pair<Int, Int>, Double> {
         var minDistance = Double.MAX_VALUE
         var nearestSample: Pair<Int, Int>? = null
 
         for (sample in samples) {
-            val distance = this.euclideanDistance(sample, allBssids)
+            val distance = this.euclideanDistance(sample, allBSSIDs)
             if (distance < minDistance) {
                 minDistance = distance
                 nearestSample = sample.zone to sample.sample
