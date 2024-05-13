@@ -87,14 +87,21 @@ class SelectMapActivity : VolumeNavigation() {
         val jsonObject = JsonParser.parseString(jsonData).asJsonObject
         val mapsArray = jsonObject.getAsJsonArray("maps")
 
-        return mapsArray.map { jsonArray ->
+        return mapsArray.mapNotNull { jsonArray ->
             val mapLat = jsonArray.asJsonArray[2].asDouble
             val mapLon = jsonArray.asJsonArray[3].asDouble
-            val mapId=jsonArray.asJsonArray[1].asInt
+            val mapId = jsonArray.asJsonArray[1].asInt
             val distance = calculateDistance(location.latitude, location.longitude, mapLat, mapLon)
-            MapInfoDistance(jsonArray.asJsonArray[0].asString, mapId, distance)
+
+            // Check if the map is within 30 meters
+            if (distance <= 200.0) {
+                MapInfoDistance(jsonArray.asJsonArray[0].asString, mapId, distance)
+            } else {
+                null // Exclude maps that are further than 30 meters
+            }
         }
     }
+
 
     private fun calculateDistance(lat1: Double, lon1: Double, lat2: Double, lon2: Double): Double {
         // Keep the distance calculation logic
@@ -109,7 +116,7 @@ class SelectMapActivity : VolumeNavigation() {
     }
 
     private fun displayMaps(maps: List<MapInfoDistance>) {
-        val adapter = MapsAdapter(maps) { selectedMap ->
+        val adapter = MapsAdapter(maps.take(4)) { selectedMap ->
             // Handle map selection
             val intent = Intent(this@SelectMapActivity, NavigationActivity::class.java)
             // Pass any necessary data to the NavigationActivity using intent extras
@@ -130,5 +137,6 @@ class SelectMapActivity : VolumeNavigation() {
         })
     }
 
-
 }
+
+

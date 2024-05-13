@@ -58,6 +58,10 @@
             android:label="@string/title_selectmap_activity">
         </activity>
 
+        <activity android:name=".NavigationActivity"
+            android:label="@string/title_navigation_activity">
+        </activity>
+
 
 
 

@@ -5,18 +5,12 @@ import Sample
 import android.os.Bundle
 import android.widget.Button
 import androidx.appcompat.app.AppCompatActivity
-import android.content.Intent
-import android.app.AlertDialog
-import android.content.Context
-import android.content.DialogInterface
 import android.hardware.Sensor
 import android.hardware.SensorEvent
 import android.hardware.SensorEventListener
 import android.hardware.SensorManager
-import android.net.wifi.WifiManager
+import android.os.Looper
 import android.speech.tts.TextToSpeech
-import android.widget.EditText
-import android.widget.Toast
 import com.google.gson.JsonArray
 import com.google.gson.JsonParser
 import okhttp3.ResponseBody
@@ -24,10 +18,13 @@ import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 import java.util.*
+import kotlin.math.abs
 
 class NavigationActivity : AppCompatActivity(), SensorEventListener {
 
     private lateinit var tts: TextToSpeech
+    private var currentZone: Pair<Int,Int>? = null
+    private var consecutiveSamples: MutableMap<Pair<Int, Int>, Int> = mutableMapOf()
     private lateinit var sensorManager: SensorManager
     private var accelerometer: Sensor? = null
     private var magnetometer: Sensor? = null
@@ -36,7 +33,7 @@ class NavigationActivity : AppCompatActivity(), SensorEventListener {
     private val rotationMatrix = FloatArray(9)
     private val orientationAngles = FloatArray(3)
     private lateinit var buttonGetInformation: Button
-    private val handler = android.os.Handler()
+    private val handler = android.os.Handler(Looper.getMainLooper())
     private val updateRunnable = object : Runnable {
         override fun run() {
             performScanAndCalculatePosition()
@@ -58,7 +55,7 @@ class NavigationActivity : AppCompatActivity(), SensorEventListener {
         val mapId = intent.getIntExtra("MAP_ID", 0)
         fetchFingerprints(mapId)
         fetchPositionInformation(mapId)
-
+        handler.post(updateRunnable)
         buttonGetInformation.setOnClickListener {
             speakPositionInformation()
         }
@@ -122,7 +119,7 @@ class NavigationActivity : AppCompatActivity(), SensorEventListener {
     }
 
     private fun observeScanResults() {
-        wifiScanner.wifiScanResults.observe(this, { scanResults ->
+        wifiScanner.wifiScanResults.observe(this) { scanResults ->
             val currentFingerprints = scanResults.map {
                 Fingerprint(it.SSID, it.BSSID, it.frequency, it.level)
             }
@@ -130,22 +127,40 @@ class NavigationActivity : AppCompatActivity(), SensorEventListener {
             val nearestSample = currentSample.findNearestSample(serverFingerprints, allBssids)
             val azimuthMeasured = measureAzimuth()
 
-            val treshold= if(nearestSample.first.first==4 || nearestSample.first.first==6) 45 else 90
+            val threshold =
+                if (nearestSample.first.first == 4 || nearestSample.first.first == 6) 45 else 90
 
             val matchedInfo = positionInfoList.find {
-                Math.abs(it.azimuth - azimuthMeasured) < treshold &&
+                abs(it.azimuth - azimuthMeasured) < threshold &&
                         it.zone == nearestSample.first.first &&
                         it.sample == nearestSample.first.second
             }
 
+            val currentDetectedZone = nearestSample.first
+
+            // Increment consecutive samples count for the current detected zone
+            consecutiveSamples[currentDetectedZone] = (consecutiveSamples[currentDetectedZone] ?: 0) + 1
+
+            // Check if the consecutive samples threshold is reached
+            if ((consecutiveSamples[currentDetectedZone] ?: 0) >= 3) {
+                // If the detected zone is different from the current zone, update the current zone
+                if (currentZone != currentDetectedZone) {
+                    currentZone = currentDetectedZone
+                    // Speak the position information only if the zone changes
+                    speakPositionInformationIfNeeded(matchedInfo)
+                }
+                // Reset the consecutive samples count for the current zone
+                consecutiveSamples[currentDetectedZone] = 0
+            }
+
+            // Update the position information text on the button
             val positionText = "Azimuth: $azimuthMeasured\n" +
                     "Nearest Position: Zone: ${nearestSample.first.first}, Sample: ${nearestSample.first.second}\n" +
                     "Info: ${matchedInfo?.info ?: "No matching info found"}"
-
             buttonGetInformation.text = positionText
-            speakPositionInformationIfNeeded(matchedInfo)
-        })
+        }
     }
+
 
     private fun speakPositionInformationIfNeeded(matchedInfo: DirectionInfo?) {
         if (matchedInfo != null) {

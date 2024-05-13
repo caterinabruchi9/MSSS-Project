@@ -5,7 +5,7 @@ import retrofit2.converter.gson.GsonConverterFactory
 
 object RetrofitClient {
     private val baseUrlFormat = "https://%s.ngrok-free.app/"
-    var subdomain = "a68f-131-114-63-2"
+    var subdomain = "52ad-131-114-63-2"
     private var retrofit: Retrofit = buildRetrofitClient()
 
     val service: ApiService
