@@ -99,7 +99,7 @@ class DBManager:
             self.cursor.execute('SELECT * FROM maps WHERE map_id = ?',(map_id,))
             map = self.cursor.fetchone()
             self.cursor.execute('''
-                SELECT directions.zone, directions.sample, directions.azimut, directions.info
+                SELECT directions.zone, directions.sample, directions.azimuth, directions.threshold, directions.info
                 FROM directions INNER JOIN maps ON maps.map_id = directions.map_id 
                 WHERE maps.map_id = ?
                 ''', (map_id,))

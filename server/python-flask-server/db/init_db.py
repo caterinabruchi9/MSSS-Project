@@ -16,10 +16,10 @@ def insert_map(map_id, building_name, rooms, latitude, longitude, conn, cursor):
 
 
 # Function to insert data into the directions table
-def insert_direction(map_id, zone, sample, azimut, info, conn, cursor):
+def insert_direction(map_id, zone, sample, azimuth, threshold, info, conn, cursor):
     cursor.execute('''
-        INSERT INTO directions(map_id, zone, sample, azimut, info) VALUES (?, ?, ?, ?, ?)
-    ''', (map_id, zone, sample, azimut, info))
+        INSERT INTO directions(map_id, zone, sample, azimuth, threshold, info) VALUES (?, ?, ?, ?, ?, ?)
+    ''', (map_id, zone, sample, azimuth, threshold, info))
     conn.commit()
 
 
@@ -43,7 +43,7 @@ def insert_directions(file_path, map_id, conn, cursor):
     df = read_csv(file_path)
 
     for index, row in df.iterrows():
-        insert_direction(map_id, row['zone'], row['sample'], row['azimut'], row['info'],conn, cursor)
+        insert_direction(map_id, row['zone'], row['sample'], row['azimuth'], row['threshold'], row['info'], conn, cursor)
 
 
 
@@ -99,9 +99,10 @@ def main():
             map_id INTEGER NOT NULL,
             zone INTEGER NOT NULL,
             sample INTEGER NOT NULL,
-            azimut REAL NOT NULL,
+            azimuth REAL NOT NULL,
+            threshold INTEGER NOT NULL,
             info TEXT NOT NULL,
-            PRIMARY KEY (map_id, zone, sample, azimut),
+            PRIMARY KEY (map_id, zone, sample, azimuth),
             FOREIGN KEY (map_id) REFERENCES maps(map_id)
         )
     ''')

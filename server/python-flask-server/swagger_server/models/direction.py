@@ -11,12 +11,13 @@ from swagger_server import util
 
 class Direction(Model):
 
-    def __init__(self, map_id: int=None, zone: int=None, sample: int=None, azimut: float=None, info: str=None):
+    def __init__(self, map_id: int=None, zone: int=None, sample: int=None, azimuth: float=None, threshold: int=None, info: str=None):
         self.swagger_types = {
             'map_id': int,
             'zone': int,
             'sample': int,
-            'azimut': float,
+            'azimuth': float,
+            'threshold': int,
             'info': str
         }
 
@@ -24,14 +25,16 @@ class Direction(Model):
             'map_id': 'map-id',
             'zone': 'zone',
             'sample': 'sample',
-            'azimut': 'azimut',
+            'azimuth': 'azimuth',
+            'threshold': 'threshold',
             'info': 'info'
         }
 
         self._map_id = map_id
         self._zone = zone
         self._sample = sample
-        self._azimut = azimut
+        self._azimuth = azimuth
+        self._threshold = threshold
         self._info = info
 
     @classmethod
@@ -113,24 +116,47 @@ class Direction(Model):
         self._sample = sample
 
     @property
-    def azimut(self) -> float:
-        """Gets the azimut of this Direction.
+    def azimuth(self) -> float:
+        """Gets the azimuth of this Direction.
 
 
-        :return: The azimut of this Direction.
+        :return: The azimuth of this Direction.
         :rtype: float
         """
-        return self._azimut
+        return self._azimuth
 
-    @azimut.setter
-    def azimut(self, azimut: float):
-        """Sets the azimut of this Direction.
+    @azimuth.setter
+    def azimuth(self, azimuth: float):
+        """Sets the azimuth of this Direction.
 
 
-        :param azimut: The azimut of this Direction.
-        :type azimut: float
+        :param azimuth: The azimuth of this Direction.
+        :type azimuth: float
         """
-        if azimut is None:
-            raise ValueError("Invalid value for `azimut`, must not be `None`")  # noqa: E501
+        if azimuth is None:
+            raise ValueError("Invalid value for `azimuth`, must not be `None`")  # noqa: E501
 
-        self._azimut = azimut
+        self._azimuth = azimuth
+
+    @property
+    def threshold(self) -> int:
+        """Gets the threshold of this Direction.
+
+
+        :return: The threshold of this Direction.
+        :rtype: int
+        """
+        return self._threshold
+
+    @threshold.setter
+    def threshold(self, threshold: int):
+        """Sets the threshold of this Direction.
+
+
+        :param threshold: The threshold of this Direction.
+        :type threshold: int
+        """
+        if threshold is None:
+            raise ValueError("Invalid value for `threshold`, must not be `None`")  # noqa: E501
+
+        self._threshold = threshold

@@ -217,6 +217,7 @@ definitions:
     - "zone"
     - "sample"
     - "azimut"
+    - "threshold"
     - "info"
     properties:
       map-id:
@@ -235,5 +236,9 @@ definitions:
         type: "number"
         format: "float"
         example: 192.5
+      threshold:
+        type: "integer"
+        format: "int64"
+        example: 90
       info:
         type: "string"
