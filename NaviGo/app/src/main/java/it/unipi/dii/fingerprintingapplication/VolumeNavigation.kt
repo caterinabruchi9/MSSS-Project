@@ -52,10 +52,10 @@ open class VolumeNavigation : AppCompatActivity(), TextToSpeech.OnInitListener {
     private fun selectButton(index: Int) {
         buttons.forEachIndexed { i, button ->
             if (i == index) {
-                button.setBackgroundResource(android.R.color.holo_blue_light)
+                button.setBackgroundResource(android.R.color.transparent)
                 speak(button.text.toString()) // Speak the button's text when selected
             } else {
-                button.setBackgroundResource(android.R.color.transparent)
+                button.setBackgroundResource(android.R.color.holo_blue_dark)
             }
         }
 
