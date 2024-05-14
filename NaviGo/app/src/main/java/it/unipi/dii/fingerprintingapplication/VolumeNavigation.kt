@@ -59,7 +59,6 @@ open class VolumeNavigation : AppCompatActivity(), TextToSpeech.OnInitListener {
             }
         }
 
-        Toast.makeText(this, "Selected button ${index + 1}", Toast.LENGTH_SHORT).show()
     }
 
 

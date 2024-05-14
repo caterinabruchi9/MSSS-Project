@@ -64,7 +64,7 @@ class SelectMapActivity : VolumeNavigation() {
                     val nearbyMaps = parseNearbyMaps(jsonData, location)
 
                     if (nearbyMaps.isEmpty()) {
-                        Toast.makeText(this@SelectMapActivity, "No maps within 30 meters", Toast.LENGTH_LONG).show()
+                        Toast.makeText(this@SelectMapActivity, "No maps within 200 meters", Toast.LENGTH_LONG).show()
                     } else {
                         displayMaps(nearbyMaps)
 
@@ -93,7 +93,7 @@ class SelectMapActivity : VolumeNavigation() {
             val mapId = jsonArray.asJsonArray[1].asInt
             val distance = calculateDistance(location.latitude, location.longitude, mapLat, mapLon)
 
-            // Check if the map is within 30 meters
+            // Check if the map is within 200 meters
             if (distance <= 200.0) {
                 MapInfoDistance(jsonArray.asJsonArray[0].asString, mapId, distance)
             } else {

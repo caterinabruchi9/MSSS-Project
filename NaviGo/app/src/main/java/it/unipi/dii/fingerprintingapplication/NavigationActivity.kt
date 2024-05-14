@@ -39,7 +39,7 @@ class NavigationActivity : AppCompatActivity(), SensorEventListener {
     private val updateRunnable = object : Runnable {
         override fun run() {
             performScanAndCalculatePosition()
-            handler.postDelayed(this, 250) // Execute every 1000 ms
+            handler.postDelayed(this, 250) // Execute every 250 ms
         }
     }
 
@@ -57,6 +57,15 @@ class NavigationActivity : AppCompatActivity(), SensorEventListener {
         val mapId = intent.getIntExtra("MAP_ID", 0)
         fetchFingerprints(mapId)
         fetchPositionInformation(mapId)
+
+        // Initialize Text-to-Speech and welcome message
+        tts = TextToSpeech(applicationContext, TextToSpeech.OnInitListener { status ->
+            if (status != TextToSpeech.ERROR) {
+                tts.language = Locale.getDefault()
+                speak("Welcome to the Navigation System. If you want to hear the informations again, just press the screen.")
+            }
+        })
+
         handler.post(updateRunnable)
         buttonGetInformation.setOnClickListener {
             speakPositionInformation()
@@ -88,6 +97,9 @@ class NavigationActivity : AppCompatActivity(), SensorEventListener {
         handler.removeCallbacks(updateRunnable)
         sensorManager.unregisterListener(this)
         wifiScanner.unregisterReceiver()
+        if (::tts.isInitialized) {
+            tts.shutdown()
+        }
     }
 
     override fun onSensorChanged(event: SensorEvent) {
@@ -133,7 +145,6 @@ class NavigationActivity : AppCompatActivity(), SensorEventListener {
             val nearestZone = nearestSample.first.first
             val nearestZoneSample = nearestSample.first.second
 
-
             val matchedInfo = positionInfoList.find {
                 abs(it.azimuth - azimuthMeasured) < it.threshold &&
                         it.zone == nearestZone &&
@@ -162,7 +173,6 @@ class NavigationActivity : AppCompatActivity(), SensorEventListener {
             buttonGetInformation.text = positionText
         }
     }
-
 
     private fun speakPositionInformationIfNeeded(matchedInfo: DirectionInfo?) {
         if (matchedInfo != null) {
@@ -243,12 +253,8 @@ class NavigationActivity : AppCompatActivity(), SensorEventListener {
     }
 
     private fun speak(text: String) {
-        tts = TextToSpeech(applicationContext) { status ->
-            if (status != TextToSpeech.ERROR) {
-                val locale = Locale.getDefault()
-                tts.language = locale
-                tts.speak(text, TextToSpeech.QUEUE_FLUSH, null, null)
-            }
+        if (::tts.isInitialized) {
+            tts.speak(text, TextToSpeech.QUEUE_FLUSH, null, null)
         }
     }
 }
