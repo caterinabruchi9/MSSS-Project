@@ -158,7 +158,7 @@ class NavigationActivity : AppCompatActivity(), SensorEventListener {
             }
 
             // Update the position information text on the button
-            val positionText = "${matchedInfo?.info ?: "No matching info found"}"
+            val positionText = "zone: ${nearestZone}\n sample: ${nearestZoneSample}\n ${matchedInfo?.info ?: "No matching info found"}"
             buttonGetInformation.text = positionText
         }
     }
