@@ -39,7 +39,7 @@ class NavigationActivity : AppCompatActivity(), SensorEventListener {
     private val updateRunnable = object : Runnable {
         override fun run() {
             performScanAndCalculatePosition()
-            handler.postDelayed(this, 100) // Execute every 100 ms
+            handler.postDelayed(this, 250) // Execute every 100 ms
         }
     }
 
@@ -156,13 +156,13 @@ class NavigationActivity : AppCompatActivity(), SensorEventListener {
             consecutiveSamples[currentDetectedZone] = (consecutiveSamples[currentDetectedZone] ?: 0) + 1
 
             // Check if the consecutive samples threshold is reached (5 times in a row the same zone)
-            if ((consecutiveSamples[currentDetectedZone] ?: 0) >= 5) {
+            if ((consecutiveSamples[currentDetectedZone] ?: 0) >= 3) {
                 // If the detected zone is different from the current zone, update the current zone
                 if (currentZone != currentDetectedZone) {
                     currentZone = currentDetectedZone
                     // Speak the position information only if the zone changes
                     speakPositionInformationIfNeeded(matchedInfo)
-                    val positionText = "zone: ${matchedInfo?.zone}\n sample: ${matchedInfo?.sample}\n ${matchedInfo?.info ?: "No matching info found"}"
+                    val positionText = " ${matchedInfo?.info ?: "No matching info found"}"
                     buttonGetInformation.text = positionText
                 }
                 // Reset the consecutive samples count for the current zone
