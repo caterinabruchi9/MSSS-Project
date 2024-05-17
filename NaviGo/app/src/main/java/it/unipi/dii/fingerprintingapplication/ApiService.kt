@@ -19,7 +19,7 @@ interface ApiService {
     fun sendFingerprint(@Body fingerprintData: FingerprintData): Call<FingerprintResponse>
 
     @GET("maps/{mapId}")
-    fun getFingerprintsForMap(@Path("mapId") mapId: Int): Call<ResponseBody>  // Usa ResponseBody per la decodifica manuale
+    fun getFingerprintsForMap(@Path("mapId") mapId: Int): Call<ResponseBody>
 
     @GET("direction/{mapId}")
     fun getPositionInformation(@Path("mapId") mapId: Int): Call<PositionResponse>
@@ -63,20 +63,6 @@ data class FingerprintData(
     @SerializedName("sample") val sample: Int
 )
 
-data class FullFingerprint(
-    @SerializedName("ssid") val ssid: String,
-    @SerializedName("RSS")  val RSS: Int,
-    @SerializedName("bssid") val bssid: String,
-    @SerializedName("frequency") val frequency: Int,
-    @SerializedName("zone") val zone: Int,
-    @SerializedName("sample") val sample: Int
-)
-
-data class MapData(
-    val fingerprints: List<List<Any>>,
-    val map: List<Any>,
-    val status: Int
-)
 
 data class DirectionInfo(
     @SerializedName("zone") val zone: Int,

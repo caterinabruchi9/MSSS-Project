@@ -97,7 +97,7 @@ class SelectMapActivity : VolumeNavigation() {
             if (distance <= 200.0) {
                 MapInfoDistance(jsonArray.asJsonArray[0].asString, mapId, distance)
             } else {
-                null // Exclude maps that are further than 30 meters
+                null // Exclude maps that are further than 200 meters
             }
         }
     }
@@ -119,7 +119,7 @@ class SelectMapActivity : VolumeNavigation() {
         val adapter = MapsAdapter(maps.take(4)) { selectedMap ->
             // Handle map selection
             val intent = Intent(this@SelectMapActivity, NavigationActivity::class.java)
-            // Pass any necessary data to the NavigationActivity using intent extras
+            // Pass map id to navigation activity
             intent.putExtra("MAP_ID", selectedMap.mapId)
             startActivity(intent)
         }

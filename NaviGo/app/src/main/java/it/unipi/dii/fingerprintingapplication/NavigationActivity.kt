@@ -39,7 +39,7 @@ class NavigationActivity : AppCompatActivity(), SensorEventListener {
     private val updateRunnable = object : Runnable {
         override fun run() {
             performScanAndCalculatePosition()
-            handler.postDelayed(this, 250) // Execute every 250 ms
+            handler.postDelayed(this, 100) // Execute every 100 ms
         }
     }
 
@@ -54,6 +54,7 @@ class NavigationActivity : AppCompatActivity(), SensorEventListener {
 
         buttonGetInformation = findViewById(R.id.buttonGetInformation)
 
+        //get map id from select map activity
         val mapId = intent.getIntExtra("MAP_ID", 0)
         fetchFingerprints(mapId)
         fetchPositionInformation(mapId)
@@ -111,9 +112,7 @@ class NavigationActivity : AppCompatActivity(), SensorEventListener {
         updateOrientationAngles()
     }
 
-    override fun onAccuracyChanged(sensor: Sensor?, accuracy: Int) {
-        // Implement if needed
-    }
+    override fun onAccuracyChanged(sensor: Sensor?, accuracy: Int) {}
 
     private fun updateOrientationAngles() {
         SensorManager.getRotationMatrix(rotationMatrix, null, gravity, geomagnetic)
@@ -156,21 +155,21 @@ class NavigationActivity : AppCompatActivity(), SensorEventListener {
             // Increment consecutive samples count for the current detected zone
             consecutiveSamples[currentDetectedZone] = (consecutiveSamples[currentDetectedZone] ?: 0) + 1
 
-            // Check if the consecutive samples threshold is reached
+            // Check if the consecutive samples threshold is reached (5 times in a row the same zone)
             if ((consecutiveSamples[currentDetectedZone] ?: 0) >= 5) {
                 // If the detected zone is different from the current zone, update the current zone
                 if (currentZone != currentDetectedZone) {
                     currentZone = currentDetectedZone
                     // Speak the position information only if the zone changes
                     speakPositionInformationIfNeeded(matchedInfo)
+                    val positionText = "zone: ${matchedInfo?.zone}\n sample: ${matchedInfo?.sample}\n ${matchedInfo?.info ?: "No matching info found"}"
+                    buttonGetInformation.text = positionText
                 }
                 // Reset the consecutive samples count for the current zone
                 consecutiveSamples[currentDetectedZone] = 0
             }
 
-            // Update the position information text on the button
-            val positionText = "zone: ${nearestZone}\n sample: ${nearestZoneSample}\n ${matchedInfo?.info ?: "No matching info found"}"
-            buttonGetInformation.text = positionText
+
         }
     }
 

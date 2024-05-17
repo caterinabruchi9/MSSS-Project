@@ -5,7 +5,6 @@ import android.os.Bundle
 import android.speech.tts.TextToSpeech
 import android.widget.Button
 import android.widget.Toast
-import androidx.appcompat.app.AppCompatActivity
 import java.util.*
 
 class MainActivity : VolumeNavigation() {
@@ -22,14 +21,11 @@ class MainActivity : VolumeNavigation() {
                 // Set language to English
                 val result = tts.setLanguage(Locale.ENGLISH)
                 if (result == TextToSpeech.LANG_MISSING_DATA || result == TextToSpeech.LANG_NOT_SUPPORTED) {
-                    // Language data is missing or not supported
                     Toast.makeText(this, "English language not supported", Toast.LENGTH_SHORT).show()
                 } else {
-                    // Language set successfully
                     speak("Welcome to NaviGo. Please use the Volume Up button to navigate through the menus and the volume down button to select.")
                 }
             } else {
-                // TextToSpeech initialization failed
                 Toast.makeText(this, "TextToSpeech initialization failed", Toast.LENGTH_SHORT).show()
             }
         }
@@ -52,15 +48,13 @@ class MainActivity : VolumeNavigation() {
 
     override fun onDestroy() {
         super.onDestroy()
-        // Shutdown TextToSpeech engine when activity is destroyed
         if (::tts.isInitialized) {
             tts.stop()
             tts.shutdown()
         }
     }
 
-    private fun speak(text: String) {
-        // Speak the given text using TextToSpeech
+    private fun speak(text: String) {  // Speak the given text using TextToSpeech
         if (::tts.isInitialized) {
             tts.speak(text, TextToSpeech.QUEUE_FLUSH, null, null)
         }

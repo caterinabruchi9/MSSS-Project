@@ -15,14 +15,12 @@ import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 
-// Main activity class for handling the UI and initiating Wi-Fi scans.
+// Activity used to collect fingerprints and send them to the server.
 class ScanActivity : AppCompatActivity() {
     companion object {
-        // Request code for location permission request.
         const val LOCATION_PERMISSION_REQUEST_CODE = 100
     }
 
-    // Late-initialized properties for UI components.
     private lateinit var wifiScanner: WifiScanner
     private lateinit var textViewResults: TextView
     private lateinit var editTextIdArea: EditText
@@ -31,13 +29,13 @@ class ScanActivity : AppCompatActivity() {
     private lateinit var buttonSendFingerprint: Button
     private lateinit var textViewStatus: TextView
     private var mapId: Int = 0
-    // Called when the activity is starting.
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        // Set the user interface layout for this Activity.
+
         setContentView(R.layout.activity_scan)
-        mapId = intent.getIntExtra("MAP_ID", 0)
-        // Initialize the Wi-Fi scanner and UI components.
+        mapId = intent.getIntExtra("MAP_ID", 0) //Passed from test activity
+
         wifiScanner = WifiScanner(this)
         textViewResults = findViewById(R.id.textViewResults)
         textViewStatus = findViewById(R.id.textViewStatus)
@@ -47,7 +45,7 @@ class ScanActivity : AppCompatActivity() {
         buttonSendFingerprint = findViewById(R.id.buttonSendFingerprint)
         buttonSendFingerprint.isEnabled = false
 
-        // Observes changes in the Wi-Fi scan results and updates the UI accordingly.
+
         wifiScanner.wifiScanResults.observe(this, Observer { results ->
             val sortedResults = results.sortedWith(compareBy({ it.SSID }, { it.BSSID }))
             val resultText = sortedResults.joinToString("\n") { result ->
@@ -61,13 +59,12 @@ class ScanActivity : AppCompatActivity() {
             buttonScan.isEnabled = true
         })
 
-        // Sets up the button click listener to start Wi-Fi scanning.
+        // scan button to see scan results
         buttonScan.setOnClickListener {
             buttonSendFingerprint.isEnabled = true
             if (checkLocationPermission()) {
                 textViewStatus.text = "Scan in progress..."
                 buttonScan.isEnabled = false
-                // Triggers the Wi-Fi to toggle and start scanning.
                 //wifiScanner.toggleWifi()
                 //wifiScanner.startScanDelayed()
                 wifiScanner.startScan()
@@ -81,6 +78,8 @@ class ScanActivity : AppCompatActivity() {
             }
 
         }
+
+        // send button to send fingerprint data to server
         buttonSendFingerprint.setOnClickListener {
             sendFingerprintData()
         }
@@ -107,10 +106,9 @@ class ScanActivity : AppCompatActivity() {
         }
     }
 
-    // Called when the activity is being destroyed to prevent memory leaks.
     override fun onDestroy() {
         super.onDestroy()
-        wifiScanner.unregisterReceiver() // Unregister receiver to avoid memory leaks
+        wifiScanner.unregisterReceiver()
     }
 
     private fun sendFingerprintData() {
@@ -129,7 +127,7 @@ class ScanActivity : AppCompatActivity() {
                 bssid = scanResult.BSSID,
                 mapId = mapId,
                 frequency = scanResult.frequency,
-                zone = areaId.toInt(),  // Assicurati che questi campi siano numerici e gestisci eventuali errori di conversione
+                zone = areaId.toInt(),
                 sample = coordinates.toInt()
             )
 

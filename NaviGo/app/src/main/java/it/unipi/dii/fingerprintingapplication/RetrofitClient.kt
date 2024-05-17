@@ -18,8 +18,8 @@ object RetrofitClient {
             .build()
     }
 
-    fun updateSubdomain(newSubdomain: String) {
+    fun updateSubdomain(newSubdomain: String) { //method to update the server address if needed
         subdomain = newSubdomain
-        retrofit = buildRetrofitClient()  // Ricostruisci il client con il nuovo URL base
+        retrofit = buildRetrofitClient()
     }
 }

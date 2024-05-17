@@ -56,6 +56,7 @@ class TestActivity : AppCompatActivity() {
             fetchMapsAndShowDialog2()
         }
 
+        //button to change the server address
         buttonChangeServerAddress.setOnClickListener {
             val newSubdomain = editTextServerSubdomain.text.toString()
             if (newSubdomain.isNotBlank()) {
@@ -65,6 +66,8 @@ class TestActivity : AppCompatActivity() {
                 Toast.makeText(this, "Please enter a valid server subdomain.", Toast.LENGTH_SHORT).show()
             }
         }
+
+        //compass test button
         buttonCompassTest = findViewById<Button>(R.id.buttonCompass)
         buttonCompassTest.setOnClickListener {
             val intent = Intent(this, CompassActivity::class.java)
@@ -83,7 +86,8 @@ class TestActivity : AppCompatActivity() {
             if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
 
             } else {
-                //GESTIRE IL CASO IN CUI IL PERMESSO VIENE NEGATO
+                Toast.makeText(this, "Location permission is required to use this app", Toast.LENGTH_LONG).show()
+                finish()
             }
         }
     }
@@ -175,9 +179,6 @@ class TestActivity : AppCompatActivity() {
         intent.putExtra("MAP_ID", mapId)
         startActivity(intent)
     }
-    private fun localizeMe(fingerprintData: List<FingerprintData>, mapId: List<Int>) {
 
-
-    }
 }
 

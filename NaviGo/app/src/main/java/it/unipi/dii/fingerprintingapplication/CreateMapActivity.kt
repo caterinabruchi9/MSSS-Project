@@ -13,7 +13,6 @@ import java.util.UUID
 
 class CreateMapActivity : AppCompatActivity(){
 
-    // Late-initialized properties for UI components.
     private lateinit var editTextBuildingName: EditText
     private lateinit var editTextRooms: EditText
     private lateinit var buttonCreateMap: Button
@@ -40,9 +39,8 @@ class CreateMapActivity : AppCompatActivity(){
             override fun onResponse(call: Call<MapResponse>, response: Response<MapResponse>) {
                 if (response.isSuccessful && response.body() != null) {
                     val responseBody = response.body()!!
-                    // Controllo dello stato della risposta
                     if (responseBody.status == 200) {
-                        // Azione in caso di successo
+                        // Success
                         runOnUiThread {
                             Toast.makeText(applicationContext, "Map created successfully! Message: ${responseBody.message}", Toast.LENGTH_LONG).show()
                         }
@@ -50,13 +48,13 @@ class CreateMapActivity : AppCompatActivity(){
                         intent.putExtra("mode", "new")
                         startActivity(intent)
                     } else {
-                        // Azione in caso di risposta non riuscita ma valida
+                        // Server down or other error
                         runOnUiThread {
                             Toast.makeText(applicationContext, "Failed to create map: ${responseBody.message}", Toast.LENGTH_LONG).show()
                         }
                     }
                 } else {
-                    // Gestione di una risposta non riuscita, es. 400 o 500 status code
+                    // error in the response
                     runOnUiThread {
                         Toast.makeText(applicationContext, "Error creating map: ${response.errorBody()?.string()}", Toast.LENGTH_LONG).show()
                     }
@@ -64,7 +62,6 @@ class CreateMapActivity : AppCompatActivity(){
             }
 
             override fun onFailure(call: Call<MapResponse>, t: Throwable) {
-                // Gestione di errori di rete o altro
                 runOnUiThread {
                     Toast.makeText(applicationContext, "Network error or other issue: ${t.message}", Toast.LENGTH_LONG).show()
                 }

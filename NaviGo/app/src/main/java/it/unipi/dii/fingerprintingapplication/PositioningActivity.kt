@@ -6,28 +6,17 @@ import android.os.Bundle
 import android.widget.Button
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
-import android.content.Intent
-import android.app.AlertDialog
-import android.content.Context
-import android.content.DialogInterface
 import android.hardware.Sensor
 import android.hardware.SensorEvent
 import android.hardware.SensorEventListener
 import android.hardware.SensorManager
-import android.net.wifi.WifiManager
-import android.widget.EditText
-import android.widget.Toast
 import com.google.gson.JsonParser
 import okhttp3.ResponseBody
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModelProvider
 import com.google.gson.JsonArray
-import kotlin.time.Duration.Companion.milliseconds
-import kotlin.time.Duration.Companion.nanoseconds
-import kotlin.time.Duration.Companion.seconds
 
 class PositioningActivity : AppCompatActivity(), SensorEventListener {
 
@@ -42,14 +31,14 @@ class PositioningActivity : AppCompatActivity(), SensorEventListener {
     private lateinit var textViewPosition: TextView
     private lateinit var buttonCalculatePosition: Button
     private lateinit var wifiScanner: WifiScanner
-    private var serverFingerprints: List<Sample> = emptyList()  // Memorizza i fingerprint come una lista di Sample
+    private var serverFingerprints: List<Sample> = emptyList()  // Fingerprints from the server
     private lateinit var allBssids: Set<String>
 
     private val handler = android.os.Handler()
     private val updateRunnable = object : Runnable {
         override fun run() {
             performScanAndCalculatePosition()
-            handler.postDelayed(this, 100) // Esegui ogni 100 ms
+            handler.postDelayed(this, 100) //execute every 100 ms
         }
     }
 
@@ -96,9 +85,7 @@ class PositioningActivity : AppCompatActivity(), SensorEventListener {
         SensorManager.getRotationMatrix(rotationMatrix, null, gravity, geomagnetic)
         SensorManager.getOrientation(rotationMatrix, orientationAngles)
     }
-    override fun onAccuracyChanged(sensor: Sensor?, accuracy: Int) {
-        // Implement if needed
-    }
+    override fun onAccuracyChanged(sensor: Sensor?, accuracy: Int) {}
 
     private fun measureAzimuth(): Float {
         var azimut=  Math.toDegrees(orientationAngles[0].toDouble()).toFloat()
@@ -109,10 +96,10 @@ class PositioningActivity : AppCompatActivity(), SensorEventListener {
 
     private fun performScanAndCalculatePosition() {
         count++;
-        buttonCalculatePosition.isActivated = false // Disabilita il bottone
-        wifiScanner.wifiScanResults.removeObservers(this)  // Rimuovi gli osservatori precedenti
-        wifiScanner.startScan()  // Avvia la scansione WiFi
-        observeScanResults()     // Aggiungi un nuovo osservatore
+        buttonCalculatePosition.isActivated = false
+        wifiScanner.wifiScanResults.removeObservers(this)
+        wifiScanner.startScan()
+        observeScanResults()
     }
 
 

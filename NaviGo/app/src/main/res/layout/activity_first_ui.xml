@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<!-- res/layout/activity_main.xml -->
+
 <LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical">
 
-    <!-- Button for selecting a map, taking up 3/4 of the screen -->
+
     <Button
         android:id="@+id/buttonSelectMap"
         android:background="@color/black"
@@ -24,7 +24,7 @@
         android:background="#FFFFFF"
         android:layout_height="3dp" />
 
-    <!-- Button for admin options, taking up 1/4 of the screen -->
+
     <Button
         android:id="@+id/buttonAdminOptions"
         android:background="#000000"
