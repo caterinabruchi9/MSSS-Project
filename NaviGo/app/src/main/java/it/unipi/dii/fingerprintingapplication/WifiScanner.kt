@@ -47,6 +47,7 @@ class WifiScanner(private val context: Context) {
     }
 
     // Function to disable and then re-enable WiFi to force a fresh scan
+    // Used to solve initial issues but no more necessary
     fun toggleWifi() {
         wifiManager.isWifiEnabled = false
         Handler(Looper.getMainLooper()).postDelayed({

@@ -1,6 +1,6 @@
 package it.unipi.dii.fingerprintingapplication
 
-
+//compass testing activity
 
 import android.hardware.Sensor
 import android.hardware.SensorEvent
@@ -11,7 +11,6 @@ import android.os.Handler
 import android.widget.Button
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
-import it.unipi.dii.fingerprintingapplication.R
 
 class CompassActivity : AppCompatActivity(), SensorEventListener {
 
@@ -40,16 +39,15 @@ class CompassActivity : AppCompatActivity(), SensorEventListener {
         buttonGetAzimuth = findViewById<Button>(R.id.orientationButton)
         textViewAzimuth = findViewById(R.id.orientationResult)
 
+        // Trigger azimuth calculation when the button is clicked
         buttonGetAzimuth.setOnClickListener {
-            // Trigger azimuth calculation when the button is clicked
             startAzimuthSampling()
         }
     }
 
     private fun startAzimuthSampling() {
-        buttonGetAzimuth.isEnabled = false // Disable the button during sampling
+        buttonGetAzimuth.isEnabled = false
 
-        // Register sensor listeners
         magnetometer?.also { magSensor ->
             sensorManager.registerListener(
                 this,
@@ -65,20 +63,18 @@ class CompassActivity : AppCompatActivity(), SensorEventListener {
             )
         }
 
-        // Stop sampling after one second
+
         handler.postDelayed({
             stopAzimuthSampling()
         }, 1000)
     }
 
     private fun stopAzimuthSampling() {
-        sensorManager.unregisterListener(this) // Unregister sensor listeners
-        buttonGetAzimuth.isEnabled = true // Re-enable the button after sampling
+        sensorManager.unregisterListener(this)
+        buttonGetAzimuth.isEnabled = true
     }
 
-    override fun onAccuracyChanged(sensor: Sensor?, accuracy: Int) {
-        // Do something if accuracy changes
-    }
+    override fun onAccuracyChanged(sensor: Sensor?, accuracy: Int) {}
 
     override fun onSensorChanged(event: SensorEvent?) {
         if (event == null) return

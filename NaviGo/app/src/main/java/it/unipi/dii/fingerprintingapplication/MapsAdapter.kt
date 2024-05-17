@@ -21,19 +21,18 @@ class MapsAdapter(
 
     // Bind the data to the button in the ViewHolder
     override fun onBindViewHolder(holder: MapViewHolder, position: Int) {
-        val mapInfo = maps[position] // Get the MapInfoDistance object for the current position
-        holder.bind(mapInfo) // Bind the map data to the button
+        val mapInfo = maps[position]
+        holder.bind(mapInfo)
     }
 
     override fun getItemCount(): Int {
-        return maps.size // Return the total number of items
+        return maps.size
     }
 
-    // ViewHolder for individual button-based map items
     class MapViewHolder(private val button: Button, private val onMapClick: (MapInfoDistance) -> Unit) : RecyclerView.ViewHolder(button) {
         fun bind(mapInfo: MapInfoDistance) {
-            button.text = "${mapInfo.buildingName} - ${String.format("%.2f m", mapInfo.distance)}" // Set the button text
-            button.setOnClickListener { onMapClick(mapInfo) } // Set click listener
+            button.text = "${mapInfo.buildingName} - ${String.format("%.2f m", mapInfo.distance)}"
+            button.setOnClickListener { onMapClick(mapInfo) }
         }
     }
 
