@@ -1,0 +1,15 @@
+22/04/2024 - 1h:00 Ricerca informazioni optimal landmark per fingerprinting
+24/04/2024 - 2h:00 Data collection Fingerprinting Wifi
+24/04/2024 - 1h:00 Pulizia dataset fingerprinting preliminare
+27/04/2024 - 1h:00 Implementazione KNN per localization
+29/04/2024 - 1h:00 Implementazione KNN per localization
+03/05/2024 - 1h:00 Azimuth Activity creation
+04/05/2024 - 2h:00 Azimuth Activity creation
+06/05/2024 - 1h:00 New Map fingerprinting collection
+09/05/2024 - 0:30m Gudiance Phrases database creation 
+11/05/2024 - 3h:00 Report writing 
+13/05/2024 - 3h:00 Application testing of new map
+14/05/2024 - 3h:00 Application testing
+15/05/2024 - 3h:30 Application testing, design of performance analysis
+17/05/2024 - 3h:00 Application Testing and Report writing
+18/05/2024 - 5h:00 Report writing and presentation
