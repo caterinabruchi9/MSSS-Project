@@ -1,0 +1,10 @@
+24/04/2024 - 2h:30 - Realizzazione dello skeleton del server python
+24/04/2024 - 2h:00 - Fingerprinting del 2nd piano del Polo A
+24/04/2024 - 1h:00 - Preparazione dataset preliminare
+26/04/2024 - 3h:00 - Sviluppo della logica del server per servire le richieste HTTP relative all'API 'maps' e 'fingerprints'
+27/04/2024 - 2h:00 - Implementazione KNN per localization
+29/04/2024 - 1h:00 - Refactoring server phyton
+10/05/2024 - 2h:00 - Sviluppo della logica del server per servire le richieste HTTP relative all'API 'directions'
+15/05/2024 - 3h:30 - Design ed esecuzione della fase di testing
+17/05/2024 - 3h:00 - Test sul campo dell'applicazione (non fase di testing, app finale), video demo applicazione 
+18/05/2024 - 4h:00 - Revisione della documentazione, revisione del codice, creazione della presentazione power point
