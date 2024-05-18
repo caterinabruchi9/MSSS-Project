@@ -1,4 +1,4 @@
-zone,sample,azimut,threshold,info
+zone,sample,azimuth,threshold,info
 1,1,290.0,90,"Behind you is the entrance to the department, to your left are the stairs to the first floor."
 1,1,110.0,90,"In front of you is the entrance to the department, to your right are the stairs to the first floor."
 2,1,290.0,90,"To your right is the upper entrance of classroom ADII1, continuing in this direction you will find A28."

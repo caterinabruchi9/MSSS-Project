@@ -108,7 +108,7 @@ def main():
     ''')
     conn.commit()
 
-    insert_directions('directions.csv', 1, conn, cursor)
+    insert_directions('directions.1.1.csv', 1, conn, cursor)
 
     # Close the cursor and connection when done
     cursor.close()
