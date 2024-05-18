@@ -156,20 +156,20 @@ class NavigationActivity : AppCompatActivity(), SensorEventListener {
             consecutiveSamples[currentDetectedZone] = (consecutiveSamples[currentDetectedZone] ?: 0) + 1
 
             // Check if the consecutive samples threshold is reached (5 times in a row the same zone)
-            if ((consecutiveSamples[currentDetectedZone] ?: 0) >= 3) {
+            if ((consecutiveSamples[currentDetectedZone] ?: 0) >= 5) {
                 // If the detected zone is different from the current zone, update the current zone
                 if (currentZone != currentDetectedZone) {
                     currentZone = currentDetectedZone
                     // Speak the position information only if the zone changes
                     speakPositionInformationIfNeeded(matchedInfo)
-                    val positionText = " ${matchedInfo?.info ?: "No matching info found"}"
-                    buttonGetInformation.text = positionText
+
                 }
                 // Reset the consecutive samples count for the current zone
                 consecutiveSamples[currentDetectedZone] = 0
             }
 
-
+            val positionText = " ${matchedInfo?.info ?: "Go ahead to get new information"}"
+            buttonGetInformation.text = positionText
         }
     }
 
