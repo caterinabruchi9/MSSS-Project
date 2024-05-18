@@ -1,0 +1,14 @@
+22/04/2024 - 1h:00 Ricerca informazioni su direttive per la creazione di applicazioni per persone con difficoltà visive
+22/04/2024 - Moro,Bologna 1h:00 Relizzazione bozza applicazione fingerprinting
+23/04/2024 - Moro,Bologna 2h:00 Relizzazione bozza applicazione fingerprinting
+24/04/2024 - Casu, Bruchi, Bologna, Moro - 1h:00 - Preparazione dataset preliminare
+29/04/2024 - Moro, Bologna - 1h:00 - Testing Retrieve map from database
+01/05/2024 - 4h:00 Scheletro interfacce applicazione ufficiale con scelta delle mappe e localization activity
+02/05/2024 - 2h:00 Navigazione con tasti del volume e implementazione di text to speech
+08/05/2024 - Bologna, Bruchi, Moro - 2h:00 - Design dell'interfaccia VI friendly
+11/05/2024 - 3h:00 Debugging phase 
+13/05/2024 - 3h:00 - Test dell'applicazione (precisione della detection delle zone)
+14/05/2024 - 3h:00 - Test dell'applicazione (valutazione del ritardo/anticipo della detection della zona)
+15/05/2024 - 3h:30 - Design ed esecuzione della fase di testing (centro del corridoio vs lati)
+17/05/2024 - 3h:00 - Test sul campo dell'applicazione (non fase di testing, app finale), video demo applicazione
+18/05/2024 - 5h:00 - Revisione della documentazione, revisione del codice, creazione della presentazione power point
