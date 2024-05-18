@@ -39,7 +39,7 @@ class NavigationActivity : AppCompatActivity(), SensorEventListener {
     private val updateRunnable = object : Runnable {
         override fun run() {
             performScanAndCalculatePosition()
-            handler.postDelayed(this, 100) // Execute every 100 ms
+            handler.postDelayed(this, 250) // Execute every 100 ms
         }
     }
 
@@ -162,14 +162,14 @@ class NavigationActivity : AppCompatActivity(), SensorEventListener {
                     currentZone = currentDetectedZone
                     // Speak the position information only if the zone changes
                     speakPositionInformationIfNeeded(matchedInfo)
-                    val positionText = "zone: ${matchedInfo?.zone}\n sample: ${matchedInfo?.sample}\n ${matchedInfo?.info ?: "No matching info found"}"
-                    buttonGetInformation.text = positionText
+
                 }
                 // Reset the consecutive samples count for the current zone
                 consecutiveSamples[currentDetectedZone] = 0
             }
 
-
+            val positionText = " ${matchedInfo?.info ?: "Go ahead to get new information"}"
+            buttonGetInformation.text = positionText
         }
     }
 
