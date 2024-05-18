@@ -1,6 +1,0 @@
-<resources>
-    <string name="app_name">Fingerprinting Application</string>
-    <string name="title_scan_activity">Scan Activity</string>
-    <string name="title_createmap_activity">Create Map Activity</string>
-    <string name="title_positioning_activity">Create Map Activity</string>
-</resources>
