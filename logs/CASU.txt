@@ -5,6 +5,8 @@
 27/04/2024 - 2h:00 - Implementazione KNN per localization
 29/04/2024 - 1h:00 - Refactoring server phyton
 10/05/2024 - 2h:00 - Sviluppo della logica del server per servire le richieste HTTP relative all'API 'directions'
-15/05/2024 - 3h:30 - Design ed esecuzione della fase di testing
+13/05/2024 - 3h:00 - Test dell'applicazione (precisione della detection delle zone)
+14/05/2024 - 3h:00 - Test dell'applicazione (valutazione del ritardo/anticipo della detection della zona)
+15/05/2024 - 3h:30 - Design ed esecuzione della fase di testing (centro del corridoio vs lati)
 17/05/2024 - 3h:00 - Test sul campo dell'applicazione (non fase di testing, app finale), video demo applicazione 
-18/05/2024 - 4h:00 - Revisione della documentazione, revisione del codice, creazione della presentazione power point
+18/05/2024 - 5h:00 - Revisione della documentazione, revisione del codice, creazione della presentazione power point
