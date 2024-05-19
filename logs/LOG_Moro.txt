@@ -1,8 +1,8 @@
-22/04/2024 - 1h:00 Ricerca informazioni su direttive per la creazione di applicazioni per persone con difficoltà visive
-22/04/2024 - 1h:00 Relizzazione bozza applicazione fingerprinting
-23/04/2024 - 2h:00 Relizzazione bozza applicazione fingerprinting
+22/04/2024 - 1h:00 - Ricerca informazioni su direttive per la creazione di applicazioni per persone con difficoltà visive
+22/04/2024 - 1h:00 - Relizzazione bozza applicazione fingerprinting
+23/04/2024 - 2h:00 - Relizzazione bozza applicazione fingerprinting
 24/04/2024 - 1h:00 - Preparazione dataset preliminare
-29/04/2024 - 1h:00 - Testing Retrieve map from database
+29/04/2024 - 1h:00 - Test Retrieve map dal database
 01/05/2024 - 4h:00 - Scheletro interfacce applicazione ufficiale con scelta delle mappe e localization activity
 03/05/2024 - 2h:00 - Debugging
 04/05/2024 - 2h:00 - Navigazione con tasti del volume e implementazione di text to speech
