@@ -227,7 +227,7 @@ class PositioningActivity : AppCompatActivity(), SensorEventListener {
         super.onDestroy()
         handler.removeCallbacks(updateRunnable)
         sensorManager.unregisterListener(this)
-        wifiScanner.unregisterReceiver()  // Pulisci per evitare memory leaks
+        wifiScanner.unregisterReceiver()
     }
 }
 
